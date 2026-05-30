@@ -1,3 +1,4 @@
+# Requires Pester 5+ (Pester 3 shipped with Windows uses different syntax). Install: Install-Module Pester -MinimumVersion 5.0 -Force -SkipPublisherCheck
 . "$PSScriptRoot/../lib/doctor.ps1"
 
 Describe "Invoke-Doctor" {

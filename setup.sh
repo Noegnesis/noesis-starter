@@ -21,12 +21,12 @@ if [ ! -f "$SCRIPT_DIR/CLAUDE.md" ]; then
     exit 1
   fi
   # Pass cleanup marker so the re-exec'd script can clean up
-  SECOND_BRAIN_BOOTSTRAP_DIR="$BOOTSTRAP_DIR" exec bash "$BOOTSTRAP_DIR/setup.sh"
+  NOESIS_BOOTSTRAP_DIR="$BOOTSTRAP_DIR" exec bash "$BOOTSTRAP_DIR/setup.sh"
 fi
 
 # Clean up bootstrap temp dir if we were re-exec'd from the one-liner
-if [ -n "$SECOND_BRAIN_BOOTSTRAP_DIR" ] && [ -d "$SECOND_BRAIN_BOOTSTRAP_DIR" ]; then
-  trap 'rm -rf "$SECOND_BRAIN_BOOTSTRAP_DIR"' EXIT
+if [ -n "$NOESIS_BOOTSTRAP_DIR" ] && [ -d "$NOESIS_BOOTSTRAP_DIR" ]; then
+  trap 'rm -rf "$NOESIS_BOOTSTRAP_DIR"' EXIT
 fi
 
 PURPLE='\033[0;35m'
@@ -257,7 +257,9 @@ fi
 mkdir -p "$VAULT_PATH"/{inbox,daily,projects,research,archive,scripts,.claude/skills/vault-setup,.claude/skills/daily,.claude/skills/tldr,.claude/skills/file-intel}
 
 # Copy core files using safe_cp (won't crash if source is missing)
-backup_claude_md "$VAULT_PATH"
+# Only call backup_claude_md if the inline backup above did NOT already run
+# (i.e. BACKUP_NAME is unset/empty, which happens on fresh vaults or --check runs)
+[ -z "${BACKUP_NAME:-}" ] && backup_claude_md "$VAULT_PATH"
 safe_cp "$SCRIPT_DIR/CLAUDE.md"  "$VAULT_PATH/CLAUDE.md"
 
 # Copy memory.md: on fresh installs always, on existing vaults only if missing
