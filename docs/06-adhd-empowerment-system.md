@@ -49,7 +49,7 @@ Avoidance lives in friction. If capturing a thought requires a decision ("where 
 
 > Deadlines don't slip because you don't care. They slip because **you don't see them daily.**
 
-The fix is the morning briefing ([/daily](05-skills-and-automation.md)): every morning, the agent surfaces today's calendar, open tasks, and what's coming due — pulled from the vault and connected services, dropped into one note you actually open. The deadline you see every morning is the deadline you meet.
+The fix is the morning briefing ([/daily](05-skills-and-automation.md)): every morning, the agent surfaces today's open tasks and what's coming due — pulled from your vault (and from connected services only if you've wired them — optional; see [docs/advanced/mcp-wiring.md](advanced/mcp-wiring.md)), dropped into one note you actually open. The deadline you see every morning is the deadline you meet.
 
 ```
 Calendar + tasks + notes
@@ -58,7 +58,7 @@ Calendar + tasks + notes
         → It gets done
 ```
 
-Pair it with a weekly review ([/weekly](05-skills-and-automation.md)) so nothing falls through the gap between days.
+Pair it with a weekly review ([/weekly](05-skills-and-automation.md)) so nothing falls through the gap between days. (Note: `/weekly` is not in the starter set — build it with the skill-authoring pattern in [05 — Skills & Automation](05-skills-and-automation.md).)
 
 ---
 

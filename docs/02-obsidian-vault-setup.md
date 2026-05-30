@@ -61,15 +61,15 @@ The reference stack uses a numbered, actionability-ordered taxonomy (a PARA desc
 ```
 inbox/            ← capture / quick drop zone. Sort later.
   └─ sessions/    ← AI session summaries + ad-hoc captures
+daily/            ← daily notes (YYYY-MM-DD.md)
 projects/         ← active projects, work, research — anything with an outcome + deadline
-academics/        ← current courses ONLY (finished ones → archive)
+learning/         ← current courses / study topics (finished ones → archive)
 career/           ← longer-horizon: mentors, goals, applications
 identity/         ← reflections, journal, interests — the "who am I / why" layer
   ├─ journal/     ← your raw voice. AI NEVER edits this.
   └─ reflections/ ← curated, sparse, topical writing
 portfolio/        ← finished, presentable artifacts
 archive/          ← completed work. Never delete.
-  └─ daily/       ← operational daily + weekly notes
 sensitive/        ← credentials only; kept out of the link graph
 setup/            ← how the system itself is built (this folder lives here)
 ```
@@ -128,8 +128,8 @@ At the section level, use callouts so authorship is visible inline:
 
 A second brain only surfaces deadlines if you give it a daily heartbeat. The stack runs a **three-layer periodic model** (concept introduced in [01 — Foundations & Philosophy](01-foundations-and-philosophy.md), automated in [05 — Skills & Automation](05-skills-and-automation.md)):
 
-- **Operational daily note** (`archive/daily/YYYY/MM/YYYY-MM-DD.md`) — AI-assisted morning briefing: today's calendar, open tasks, top 3 priorities.
-- **Weekly review** (`.../weekly/YYYY-Www.md`, ISO week) — wins, lessons, next week's plan.
+- **Operational daily note** (`daily/YYYY-MM-DD.md`) — AI-assisted morning briefing: your top 3 priorities and notes (calendar/tasks appear only if you've wired an optional connector — see [docs/advanced/mcp-wiring.md](advanced/mcp-wiring.md)).
+- **Weekly review** — wins, lessons, next week's plan (not in the starter set — build your own skill following the pattern in [05 — Skills & Automation](05-skills-and-automation.md)).
 - **Journal** (`identity/journal/...`) — your raw voice, separate, AI-untouched.
 
 Start manual (a daily note template you fill in). Automate it once the agent layer is in place.

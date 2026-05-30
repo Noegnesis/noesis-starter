@@ -38,8 +38,8 @@ Start with a small, high-leverage set. These map directly onto the four jobs fro
 
 | Skill | Job it serves | What it does |
 |---|---|---|
-| **`/daily`** | Surface (retrieve) | Builds today's briefing: opens/creates the daily note, pulls calendar + unread mail + tasks, surfaces the **top 3 priorities**, asks what you're working on |
-| **`/weekly`** | Reflect | A weekly review: wins, lessons, next week's plan, seeded from the week's daily notes |
+| **`/daily`** | Surface (retrieve) | Builds today's briefing: opens/creates the daily note, reads your vault (today's note, `inbox/`, projects), surfaces the **top 3 priorities**, asks what you're working on (calendar/mail can be added later by wiring a connector — see [docs/advanced/mcp-wiring.md](advanced/mcp-wiring.md)) |
+| **`/weekly`** | Reflect | A weekly review: wins, lessons, next week's plan, seeded from the week's daily notes **(not shipped — build your own with the skill-authoring pattern in this doc)** |
 | **`/tldr`** | Capture | Saves a summary of the current session (decisions, things to remember, next actions) into the right folder |
 | **A capture/sort skill** | Triage | Processes the inbox: classifies each item, proposes a home, files on approval |
 | **A self-audit skill** | Maintain | Checks the system itself for drift/staleness (see [07 — Sync, Devices & Maintenance](07-sync-devices-and-maintenance.md)) |
@@ -97,7 +97,7 @@ Examples a second brain might use:
 
 Two more automation shapes:
 
-- **Scheduled runs** — a cron-style schedule that runs an agent task on a timer (e.g., a 7am `/daily`, a Sunday `/weekly`).
+- **Scheduled runs** — a cron-style schedule that runs an agent task on a timer (e.g., a 7am `/daily` for a vault briefing — note: calendar/mail in that briefing requires the optional connector from [docs/advanced/mcp-wiring.md](advanced/mcp-wiring.md); a Sunday `/weekly` once you've built that skill).
 - **Loops** — run a prompt or command on a recurring interval within a session (e.g., "check the deploy every 5 minutes"), or let the agent self-pace.
 
 > **How automated do you want to be?**
