@@ -85,34 +85,16 @@ Then in Claude Code:
 
 ## 4. Bringing an existing vault in (optional)
 
-You can build the scratch vault, then converge your existing notes into it. Do it
-**additively** so nothing breaks.
+Both ways of doing this safely — augment in place, or augment on a copy — plus
+wikilink-safe restructuring and how to protect a custom Claude Code setup, now
+live in the dedicated, cross-platform guide:
 
-**Golden rule:** copy, never move, from your real vault. Keep the original as a
-backup until you are satisfied.
+**→ [Augmenting an existing vault](../augmenting-an-existing-vault.md)**
 
-**Copy your content in (preserves your structure, so wikilinks stay intact):**
-
-```powershell
-# /E includes subfolders; /XD skips the scratch vault's own config + git
-robocopy "C:\path\to\your-vault" "C:\Users\<you>\noesis-scratch" /E /XD .obsidian .git
-```
-
-Open `C:\Users\<you>\noesis-scratch` in Obsidian (Open folder as vault). You now
-have your notes plus the workflow layer side by side.
-
-**If you want to restructure** (move notes into `projects/ research/ archive/`),
-do the moves **inside Obsidian** so internal links survive:
-
-1. Settings -> Files & Links -> turn **ON** "Automatically update internal links".
-2. Drag files in Obsidian's file explorer, or ask Claude to move them and then
-   explicitly ask it to fix any `[[wikilinks]]` it broke. Moving files on the file
-   system alone will not update links.
-
-**Simplest augment-on-a-copy:** make a copy of your real vault, then run
-`setup.ps1` pointed at the copy. The installer detects the existing vault, asks
-before proceeding, and only adds the workflow layer. It does not touch your
-existing notes or `.obsidian/`.
+For this Windows beta test, the quickest path is *augment on a copy*: copy your
+real vault to a scratch folder, then run `setup.ps1` pointed at the copy. The
+installer detects the existing vault, asks before proceeding, and only adds the
+workflow layer — it does not touch your existing notes or `.obsidian/`.
 
 ## 5. What to report back
 

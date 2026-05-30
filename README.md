@@ -27,6 +27,12 @@ powershell -ExecutionPolicy Bypass -File setup.ps1
 
 Prereq check only: `powershell -ExecutionPolicy Bypass -File setup.ps1 -Check`
 
+### Already have a vault?
+
+Don't start from scratch — add the Noesis layer to your existing Obsidian vault
+without risking your notes, wikilinks, or Claude Code setup. See
+**[Augmenting an existing vault](docs/augmenting-an-existing-vault.md)** (Windows + macOS).
+
 ## What gets installed
 
 Obsidian, Claude Code, Python deps (in an isolated venv), and the core skills (`/vault-setup`, `/daily`, `/tldr`, `/file-intel`) both in this vault and globally.

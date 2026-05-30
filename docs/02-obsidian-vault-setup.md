@@ -150,6 +150,44 @@ Obsidian works great with **zero** community plugins. Add these only as the need
 > **Plugin discipline**
 > Every plugin is a dependency that can break on update and adds cognitive load. The litmus test from [01 — Foundations & Philosophy](01-foundations-and-philosophy.md) applies: does it make capture / triage / retrieve / reflect *easier*? If not, don't install it. A common trap is installing overlapping plugins (e.g. two database-like tools) — pick one per job.
 
+### Installing a community plugin
+
+Community plugins are **not** installed by the setup script — Obsidian installs them in-app:
+
+> Settings → **Community plugins** → turn off *Restricted mode* (a.k.a. Safe Mode) → **Browse** → search the plugin → **Install** → **Enable**.
+
+### Notebook Navigator — set it up for your use cases (Claude can guide this)
+
+Notebook Navigator (NN) is the one explorer-replacement worth the dependency: a
+cleaner two-pane file browser, **date-aware daily notes** (click a date, open
+that day's note), and **profiles** that pin a different set of folders for each
+mode of work. It's the single biggest "my vault feels navigable" upgrade,
+especially once the daily-note folder gets deep.
+
+**Ask Claude to configure it for you.** Paste this section into Claude Code and
+say *"help me set up Notebook Navigator for how I actually work."* Claude should
+ask, then translate your answers into NN settings:
+
+1. **"What do you open almost every day?"** → point NN's daily-notes setting at
+   your `daily/` folder and match its date format (`YYYY-MM-DD`), so clicking a
+   calendar date resolves the right note instead of creating a stray one.
+2. **"Which folders are noise — setup, archives, credentials?"** → add them to
+   NN's **hidden folders** so the navigator stays calm.
+3. **"Do you switch between distinct modes — e.g. daily ops vs deep research vs
+   personal reflection?"** → if yes, build **one NN profile per mode**, each
+   pinning that mode's folders + [MOCs](#step-6--mocs-curated-retrieval). Switching
+   profiles then locks the view to one context — a meaningful reduction in visual
+   overload (see [06 — ADHD Empowerment System](06-adhd-empowerment-system.md)).
+
+> **Three NN quirks that waste an afternoon if you don't know them:**
+> - **Hidden-folders is root-level only.** You can hide top-level folders; the
+>   setting does **not** recurse into nested subfolders. Hide at the top.
+> - **"Show hidden items" is a separate runtime toggle.** Flipping it on reveals
+>   everything regardless of your hidden-folders config — they're two different
+>   controls. If hidden folders "aren't hiding," check this toggle first.
+> - **The Default profile auto-recreates on reload.** Deleting it won't stick —
+>   build your custom profiles *alongside* it rather than fighting to remove it.
+
 ---
 
 ## Step 6 — MOCs: curated retrieval
