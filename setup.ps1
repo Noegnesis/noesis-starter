@@ -1,8 +1,11 @@
 # ─────────────────────────────────────────────────────────────────────────────
-#  SECOND BRAIN — Windows Setup (PowerShell)
+#  NOESIS STARTER — Windows Setup (PowerShell)
 #  Compatible with PowerShell 5.1+ (Windows default) and PowerShell 7+
 #  Run with: powershell -ExecutionPolicy Bypass -File setup.ps1
 # ─────────────────────────────────────────────────────────────────────────────
+param([switch]$Check)
+
+if ($Check) { . "$PSScriptRoot/lib/doctor.ps1"; $m = Invoke-Doctor; exit $m }
 
 # --- Enable ANSI/VT100 color support for PS 5.1 (best-effort) ---------------
 # PS 7+ enables this automatically. PS 5.1 on Windows 10 1903+ supports it
@@ -16,11 +19,11 @@ public static extern bool SetConsoleMode(IntPtr h, uint m);
 public static extern bool GetConsoleMode(IntPtr h, out uint m);
 [DllImport("kernel32.dll", SetLastError = true)]
 public static extern IntPtr GetStdHandle(int n);
-'@ -Name 'VTConsole' -Namespace 'SecondBrainVT' -ErrorAction Stop
-    $h = [SecondBrainVT.VTConsole]::GetStdHandle(-11)
+'@ -Name 'VTConsole' -Namespace 'NoesisVT' -ErrorAction Stop
+    $h = [NoesisVT.VTConsole]::GetStdHandle(-11)
     $mode = 0
-    [SecondBrainVT.VTConsole]::GetConsoleMode($h, [ref]$mode) | Out-Null
-    [SecondBrainVT.VTConsole]::SetConsoleMode($h, $mode -bor 0x0004) | Out-Null
+    [NoesisVT.VTConsole]::GetConsoleMode($h, [ref]$mode) | Out-Null
+    [NoesisVT.VTConsole]::SetConsoleMode($h, $mode -bor 0x0004) | Out-Null
 } catch {
     # VT enablement failed — colors will show as raw escape codes
     # The script still works, just not pretty
@@ -56,17 +59,17 @@ if (-not (Test-Path "$scriptDir\CLAUDE.md")) {
         Write-Host ""
         Write-Host "  ${White}Option 2:${Reset} Clone the repo manually:"
         Write-Host "    1. Install git from https://git-scm.com/download/win"
-        Write-Host "    2. git clone https://github.com/earlyaidopters/second-brain.git"
-        Write-Host "    3. cd second-brain"
+        Write-Host "    2. git clone https://github.com/Noegnesis/noesis-starter.git"
+        Write-Host "    3. cd noesis-starter"
         Write-Host "    4. powershell -ExecutionPolicy Bypass -File setup.ps1"
         exit 1
     }
-    $bootstrapDir = Join-Path ([System.IO.Path]::GetTempPath()) "second-brain-setup"
+    $bootstrapDir = Join-Path ([System.IO.Path]::GetTempPath()) "noesis-starter-setup"
     Remove-Item $bootstrapDir -Recurse -Force -ErrorAction SilentlyContinue
-    git clone --depth=1 https://github.com/earlyaidopters/second-brain.git $bootstrapDir *>$null
+    git clone --depth=1 https://github.com/Noegnesis/noesis-starter.git $bootstrapDir *>$null
     if ($LASTEXITCODE -ne 0) {
         Write-Host "  ${Red}ERROR${Reset}  Could not clone repo. Check your internet connection."
-        Write-Host "  Alternative: download from https://github.com/earlyaidopters/second-brain"
+        Write-Host "  Alternative: download from https://github.com/Noegnesis/noesis-starter"
         exit 1
     }
     Write-Host "  ${Green}OK${Reset} Repo downloaded"
@@ -80,10 +83,10 @@ Clear-Host
 Write-Host ""
 Write-Host "${Purple}" -NoNewline
 Write-Host @"
-  ___  ___  ___ ___  _  _ ___     ___ ___  _   ___ _  _
- / __|| __|| __/ _ \| \| ||   \  | _ )_ _|/_\ |_ _| \| |
- \__ \| _| | _| (_) | .`` || |) | | _ \| | / _ \ | || .`` |
- |___/|___||___\___/|_|\_||___/  |___/___/_/ \_\___|_|\_|
+  _  _  ___  ___ ___ ___ ___     ___ _____  _   ___ _____ ___ ___
+ | \| |/ _ \| __/ __|_ _/ __|   / __|_   _|/_\ | _ \_   _| __| _ \
+ | .` | (_) | _|\__ \| |\__ \   \__ \ | | / _ \|   / | | | _||   /
+ |_|\_|\___/|___|___/___|___/   |___/ |_|/_/ \_\_|_\ |_| |___|_|_\
 "@
 Write-Host "${Reset}"
 Write-Host "  Obsidian + Claude Code - Your AI-powered second brain"
@@ -125,7 +128,7 @@ Write-Host "  ${Green}OK${Reset} winget available"
 # === STEP 2: Obsidian ========================================================
 Write-Host ""
 Write-Host "${White}Step 2/7 -- Installing Obsidian${Reset}"
-$obsCheck = (winget list --id Obsidian.Obsidian 2>$null | Select-String "Obsidian.Obsidian")
+$obsCheck = (winget list --id Obsidian.Obsidian --accept-source-agreements 2>$null | Select-String "Obsidian.Obsidian")
 if (-not $obsCheck) {
     Write-Host "  Installing Obsidian..."
     winget install --id Obsidian.Obsidian --silent --accept-package-agreements --accept-source-agreements
@@ -168,7 +171,7 @@ $pipInstalled = $false
 # Check requirements.txt exists first
 if (-not (Test-Path "$scriptDir\requirements.txt")) {
     Write-Host "  ${Orange}WARNING${Reset}  requirements.txt not found in script directory."
-    Write-Host "        After cloning: cd second-brain, then rerun:"
+    Write-Host "        After cloning: cd noesis-starter, then rerun:"
     Write-Host "        powershell -ExecutionPolicy Bypass -File setup.ps1"
 } else {
     # Try 'pip' first, then 'python -m pip', then 'py -m pip'
@@ -217,10 +220,10 @@ Write-Host ""
 Write-Host "${White}Step 5/7 -- Setting up your vault${Reset}"
 Write-Host ""
 Write-Host "  Where should your second brain live?"
-Write-Host "  ${Dim}Press Enter for default: $env:USERPROFILE\second-brain${Reset}"
+Write-Host "  ${Dim}Press Enter for default: $env:USERPROFILE\noesis-vault${Reset}"
 Write-Host "  ${Dim}(e.g. C:\Users\YourName\Documents\MyVault -- quotes OK)${Reset}"
 $vaultInput = Read-Host "  Vault path"
-if (-not $vaultInput) { $vaultInput = "$env:USERPROFILE\second-brain" }
+if (-not $vaultInput) { $vaultInput = "$env:USERPROFILE\noesis-vault" }
 
 # Sanitize: strip surrounding quotes, trim whitespace, expand tilde
 $vaultPath = $vaultInput.Trim().Trim('"').Trim("'")
@@ -332,8 +335,8 @@ foreach ($script in @("process_docs_to_obsidian.py", "process_files_with_gemini.
 
 if ($copyErrors -gt 0) {
     Write-Host "  ${Orange}WARNING${Reset}  $copyErrors file(s) missing -- vault may not work correctly."
-    Write-Host "        Try: git clone https://github.com/earlyaidopters/second-brain.git"
-    Write-Host "        Then: cd second-brain && powershell -ExecutionPolicy Bypass -File setup.ps1"
+    Write-Host "        Try: git clone https://github.com/Noegnesis/noesis-starter.git"
+    Write-Host "        Then: cd noesis-starter && powershell -ExecutionPolicy Bypass -File setup.ps1"
 }
 
 # Install skills globally (so they work in ANY folder, not just the vault)
@@ -474,7 +477,7 @@ Write-Host "  ${White}Checking installation...${Reset}"
 Write-Host "  ${Dim}(Any failures above are safe to retry -- just re-run this script.)${Reset}"
 Write-Host ""
 
-$obsVerify = (winget list --id Obsidian.Obsidian 2>$null | Select-String "Obsidian.Obsidian")
+$obsVerify = (winget list --id Obsidian.Obsidian --accept-source-agreements 2>$null | Select-String "Obsidian.Obsidian")
 if ($obsVerify) {
     Write-Host "  ${Green}OK${Reset} Obsidian"
 } else {

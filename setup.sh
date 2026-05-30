@@ -2,7 +2,7 @@
 set -e
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  SECOND BRAIN — One-command setup for Obsidian + Claude Code
+#  NOESIS STARTER — One-command setup for Obsidian + Claude Code
 # ─────────────────────────────────────────────────────────────────────────────
 
 # SCRIPT_DIR must be defined first — used throughout
@@ -12,11 +12,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # This happens when the script is run via the one-liner curl command.
 # We clone the full repo into a temp dir and re-exec from there.
 if [ ! -f "$SCRIPT_DIR/CLAUDE.md" ]; then
-  echo "Downloading Second Brain repo..."
+  echo "Downloading noesis-starter repo..."
   BOOTSTRAP_DIR="$(mktemp -d)"
-  if ! git clone --depth=1 https://github.com/earlyaidopters/second-brain.git "$BOOTSTRAP_DIR" &>/dev/null; then
+  if ! git clone --depth=1 https://github.com/Noegnesis/noesis-starter.git "$BOOTSTRAP_DIR" &>/dev/null; then
     echo "Error: Could not clone repo. Check your internet connection."
-    echo "Alternative: download the ZIP from https://github.com/earlyaidopters/second-brain"
+    echo "Alternative: download the ZIP from https://github.com/Noegnesis/noesis-starter"
     echo "             unzip it, cd into it, and run: bash setup.sh"
     exit 1
   fi
@@ -48,23 +48,36 @@ safe_cp() {
   fi
 }
 
+# ── Load shared libs ─────────────────────────────────────────────────────────
+. "$SCRIPT_DIR/lib/obsidian.sh"
+. "$SCRIPT_DIR/lib/doctor.sh"
+. "$SCRIPT_DIR/lib/vault_safety.sh"
+
+# ── Check-only mode (--check): report prereqs and exit without installing ────
+if [ "${1:-}" = "--check" ]; then
+  echo "noesis-starter doctor:"
+  run_doctor; rc=$?
+  [ "$rc" -eq 0 ] && echo "All required tools present." || echo "$rc required tool(s) missing."
+  exit "$rc"
+fi
+
 clear
 echo ""
 echo -e "${PURPLE}"
 cat << 'ASCII'
-  ███████╗███████╗ ██████╗ ██████╗ ███╗   ██╗██████╗
-  ██╔════╝██╔════╝██╔════╝██╔═══██╗████╗  ██║██╔══██╗
-  ███████╗█████╗  ██║     ██║   ██║██╔██╗ ██║██║  ██║
-  ╚════██║██╔══╝  ██║     ██║   ██║██║╚██╗██║██║  ██║
-  ███████║███████╗╚██████╗╚██████╔╝██║ ╚████║██████╔╝
-  ╚══════╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═════╝
+  ███╗   ██╗ ██████╗ ███████╗███████╗██╗███████╗
+  ████╗  ██║██╔═══██╗██╔════╝██╔════╝██║██╔════╝
+  ██╔██╗ ██║██║   ██║█████╗  ███████╗██║███████╗
+  ██║╚██╗██║██║   ██║██╔══╝  ╚════██║██║╚════██║
+  ██║ ╚████║╚██████╔╝███████╗███████║██║███████║
+  ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝╚══════╝╚═╝╚══════╝
 
-  ██████╗ ██████╗  █████╗ ██╗███╗   ██╗
-  ██╔══██╗██╔══██╗██╔══██╗██║████╗  ██║
-  ██████╔╝██████╔╝███████║██║██╔██╗ ██║
-  ██╔══██╗██╔══██╗██╔══██║██║██║╚██╗██║
-  ██████╔╝██║  ██║██║  ██║██║██║ ╚████║
-  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝
+  ███████╗████████╗ █████╗ ██████╗ ████████╗███████╗██████╗
+  ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝██╔════╝██╔══██╗
+  ███████╗   ██║   ███████║██████╔╝   ██║   █████╗  ██████╔╝
+  ╚════██║   ██║   ██╔══██║██╔══██╗   ██║   ██╔══╝  ██╔══██╗
+  ███████║   ██║   ██║  ██║██║  ██║   ██║   ███████╗██║  ██║
+  ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝
 ASCII
 echo -e "${RESET}"
 echo -e "${DIM}  Obsidian + Claude Code · Your AI-powered second brain${RESET}"
@@ -156,10 +169,10 @@ echo ""
 echo -e "${WHITE}Step 5/7 — Setting up your vault${RESET}"
 echo ""
 echo -e "  Where should your second brain live?"
-echo -e "  ${DIM}Press Enter for default: ~/second-brain${RESET}"
+echo -e "  ${DIM}Press Enter for default: ~/noesis-vault${RESET}"
 echo -e "  ${DIM}(e.g. ~/Documents/MyVault or /Users/yourname/Notes)${RESET}"
 read -rp "  Vault path: " VAULT_PATH
-VAULT_PATH="${VAULT_PATH:-$HOME/second-brain}"
+VAULT_PATH="${VAULT_PATH:-$HOME/noesis-vault}"
 VAULT_PATH="${VAULT_PATH/#\~/$HOME}"
 
 # Strip trailing slash (unless it's root /)
@@ -171,8 +184,8 @@ fi
 REAL_VAULT="$(cd "$VAULT_PATH" 2>/dev/null && pwd || echo "$VAULT_PATH")"
 REAL_SCRIPT="$(cd "$SCRIPT_DIR" 2>/dev/null && pwd)"
 if [ "$REAL_VAULT" = "$REAL_SCRIPT" ]; then
-  echo -e "  ${ORANGE}⚠${RESET}  Vault can't be the same folder as the repo. Using ~/second-brain instead."
-  VAULT_PATH="$HOME/second-brain"
+  echo -e "  ${ORANGE}⚠${RESET}  Vault can't be the same folder as the repo. Using ~/noesis-vault instead."
+  VAULT_PATH="$HOME/noesis-vault"
 fi
 
 # Guard: check if path is an existing file (not a directory)
@@ -244,6 +257,7 @@ fi
 mkdir -p "$VAULT_PATH"/{inbox,daily,projects,research,archive,scripts,.claude/skills/vault-setup,.claude/skills/daily,.claude/skills/tldr,.claude/skills/file-intel}
 
 # Copy core files using safe_cp (won't crash if source is missing)
+backup_claude_md "$VAULT_PATH"
 safe_cp "$SCRIPT_DIR/CLAUDE.md"  "$VAULT_PATH/CLAUDE.md"
 
 # Copy memory.md: on fresh installs always, on existing vaults only if missing
@@ -458,4 +472,4 @@ echo -e "  timestamped backups of CLAUDE.md, and only adds what is missing.${RES
 echo ""
 
 # Open Obsidian
-open -a Obsidian "$VAULT_PATH" 2>/dev/null || open -a Obsidian 2>/dev/null || true
+open_vault_in_obsidian "$VAULT_PATH"
