@@ -16,7 +16,7 @@ Display this, then wait:
 **How deep do you want to go?**
 
 - **Basic (recommended, fast, low token cost):** a few questions, a clean core vault you can grow into. Best on a Pro plan.
-- **Power (deeper, costs more tokens):** a longer interview that tailors the vault to how you specifically work.
+- **Power (deeper, costs more tokens):** an early version — for now, the Basic build plus a few extra tailoring questions. A full modular interview is coming soon.
 
 Reply "basic" or "power".
 
@@ -33,7 +33,7 @@ If they pick **Power**, note: "Heads up — Power asks more questions and uses m
 - Work only, or personal life too?
 - Do you have existing files to import? (PDFs, docs, slides)
 
-A few sentences is enough.
+Answer these in whatever order feels natural. No need to be formal — a few sentences is enough.
 
 ## STEP 2 — Infer and preview (don't ask more)
 
@@ -73,7 +73,10 @@ Open the folder as a vault. Detect the OS and run the right command, and ALWAYS 
 
 - macOS: `open -a Obsidian "<vault path>"`
 - Linux: `xdg-open "obsidian://open?path=<vault path>"`
-- Windows / anything else: skip the auto-open.
+- Windows: try `start "" "obsidian://open?path=<vault path>"`; if nothing opens, the manual step below covers it.
+- Anything else: skip the auto-open.
+
+If the vault path contains spaces, the auto-open URI may not resolve — the manual step always works.
 
 Then always print:
 ```
@@ -87,7 +90,7 @@ Write a first-person `CLAUDE.md` with: `## Who I Am` (2-3 specific sentences fro
 ### Write skill files
 - `.claude/skills/daily/SKILL.md`: read/create today's daily note, check `inbox/`, surface top 3, ask what we're working on.
 - `.claude/skills/tldr/SKILL.md`: summarize decisions / things to remember / next actions, save to the right folder, update `memory.md`.
-- Role skill: Business Owner -> `standup`; Developer -> `project`; Consultant -> `client`; Creator -> `content`; Student -> `research`.
+- Role skill (write a SKILL.md that does the described job): Business Owner -> `standup` (briefing across projects, decisions, people); Developer -> `project` (load a project's full context); Consultant -> `client` (load a client's full context); Creator -> `content` (read the content folder, calibrate voice, develop an idea); Student -> `research` (pull all notes on a topic and synthesize).
 
 ### Write memory.md
 ```markdown
@@ -108,7 +111,11 @@ How do you want your vault context loaded into Claude Code?
 2. Manual — I give you the line to paste per project
 3. Vault only — works when you run claude from inside this folder
 ```
-If global: append to `~/.claude/CLAUDE.md` (create if needed) a `## My Personal Context` line pointing at `[absolute vault path]/CLAUDE.md`.
+If global: append this to `~/.claude/CLAUDE.md` (create the file if needed):
+```
+## My Personal Context
+At the start of every session, read [absolute vault path]/CLAUDE.md for context about who I am, my work, and my conventions.
+```
 
 ## STEP 5 — Final output
 
