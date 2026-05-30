@@ -138,14 +138,14 @@ echo ""
 echo -e "${WHITE}Step 4/7 — Installing Python dependencies${RESET}"
 PIP_OK=false
 if command -v python3 &>/dev/null; then
-  VENV_DIR="$HOME/.second-brain-venv"
+  VENV_DIR="$HOME/.noesis-venv"
   python3 -m venv "$VENV_DIR" 2>/dev/null || true
   if "$VENV_DIR/bin/pip" install -q -r "$SCRIPT_DIR/requirements.txt" 2>/dev/null; then
     echo -e "  ${GREEN}✓${RESET} Python packages installed"
     PIP_OK=true
   else
     echo -e "  ${ORANGE}⚠${RESET}  pip install failed. To retry manually:"
-    echo -e "     python3 -m venv ~/.second-brain-venv && ~/.second-brain-venv/bin/pip install -r requirements.txt"
+    echo -e "     python3 -m venv ~/.noesis-venv && ~/.noesis-venv/bin/pip install -r requirements.txt"
   fi
 else
   echo -e "  ${ORANGE}⚠${RESET}  Python 3 not found. Install: brew install python3"
@@ -313,7 +313,7 @@ if [ -n "$IMPORT_FOLDER" ] && [ -d "$IMPORT_FOLDER" ]; then
   else
     echo ""
     echo "  Processing files with Gemini 3 Flash..."
-    if "$HOME/.second-brain-venv/bin/python3" "$VAULT_PATH/scripts/process_docs_to_obsidian.py" \
+    if "$HOME/.noesis-venv/bin/python3" "$VAULT_PATH/scripts/process_docs_to_obsidian.py" \
       "$IMPORT_FOLDER" "$VAULT_PATH/inbox"; then
       echo ""
       echo -e "  ${GREEN}✓${RESET} Files processed → saved to $VAULT_PATH/inbox"

@@ -1,0 +1,10 @@
+# Tokens that must NEVER appear in shipped files. One per line. Matched case-insensitively.
+# (Author name on LICENSE/README credits is intended authorship and is NOT listed here.)
+emmanuel.a.corona
+Stanford
+01_Projects
+04_Identity
+G:/My Drive
+/Users/emman
+/c/Users/emman
+.second-brain-venv

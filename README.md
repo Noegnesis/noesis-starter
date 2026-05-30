@@ -338,8 +338,8 @@ curl -fsSL https://claude.ai/install.sh | sh
 
 **4. Install Python dependencies**
 ```bash
-python3 -m venv ~/.second-brain-venv
-~/.second-brain-venv/bin/pip install -r second-brain/requirements.txt
+python3 -m venv ~/.noesis-venv
+~/.noesis-venv/bin/pip install -r second-brain/requirements.txt
 ```
 
 **5. Download and set up the vault**
