@@ -339,6 +339,33 @@ if ($copyErrors -gt 0) {
     Write-Host "        Then: cd noesis-starter && powershell -ExecutionPolicy Bypass -File setup.ps1"
 }
 
+# Guide in the vault (optional, default yes)
+Write-Host ""
+Write-Host "  The full guide (8 docs + advanced topics) can live inside your vault"
+Write-Host "  ${Dim}as guide\ -- read it in Obsidian, link it from your notes${Reset}"
+$guideAnswer = Read-Host "  Include the full guide in your vault? [Y/n]"
+if (-not $guideAnswer) { $guideAnswer = "Y" }
+if ($guideAnswer -match '^[Yy]') {
+    New-Item -ItemType Directory -Force -Path "$vaultPath\guide\advanced" | Out-Null
+    $guideFail = $false
+    foreach ($f in (Get-ChildItem "$scriptDir\docs" -Filter *.md -File -ErrorAction SilentlyContinue)) {
+        if ($f.Name -eq "README.md") { continue }  # README is the GitHub front door; MOC is the vault one
+        try { Copy-Item $f.FullName "$vaultPath\guide\$($f.Name)" -Force -ErrorAction Stop } catch { $guideFail = $true }
+    }
+    foreach ($f in (Get-ChildItem "$scriptDir\docs\advanced" -Filter *.md -File -ErrorAction SilentlyContinue)) {
+        try { Copy-Item $f.FullName "$vaultPath\guide\advanced\$($f.Name)" -Force -ErrorAction Stop } catch { $guideFail = $true }
+    }
+    if (Test-Path "$scriptDir\vault-template\guide\MOC - Guide.md") {
+        try { Copy-Item "$scriptDir\vault-template\guide\MOC - Guide.md" "$vaultPath\guide\MOC - Guide.md" -Force -ErrorAction Stop } catch { $guideFail = $true }
+    } else { $guideFail = $true }
+    if ($guideFail) {
+        Write-Host "  ${Orange}WARNING${Reset}  Some guide files didn't copy. Finish manually:"
+        Write-Host "        Copy-Item `"$scriptDir\docs\*.md`" `"$vaultPath\guide\`""
+    } else {
+        Write-Host "  ${Green}OK${Reset} Guide installed -> $vaultPath\guide\ (start at MOC - Guide.md)"
+    }
+}
+
 # Install skills globally (so they work in ANY folder, not just the vault)
 $globalSkillsPath = "$env:USERPROFILE\.claude\skills"
 foreach ($skill in @("vault-setup", "daily", "tldr", "file-intel")) {
