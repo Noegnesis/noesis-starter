@@ -39,7 +39,9 @@ Obsidian, Claude Code, Python deps (in an isolated venv), and the core skills (`
 
 ## Going deeper
 
-See `docs/` for the full guide, and `docs/advanced/` for optional layers (typed memory, MCP wiring, agent system, ADHD-friendly patterns).
+**📚 The full guide — pick your path → [docs/README.md](docs/README.md)**
+
+Four reading paths (Weekend Minimalist · Researcher · ADHD-First Builder · Power User), plus `docs/advanced/` for optional layers (typed memory, MCP wiring, agent system, ADHD-friendly patterns). If you let setup install it, the same guide lives inside your vault under `guide/`.
 
 ## Credits
 

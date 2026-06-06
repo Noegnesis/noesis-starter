@@ -12,4 +12,5 @@ fi
 body="$(cat "$ROOT/README.md")"
 assert_contains "$body" "Kashef" "credits Kashef / Prompt Advisers for installer prior-art"
 assert_contains "$body" "beta" "macOS path is labeled beta until hardware-verified"
+assert_contains "$body" "docs/README.md" "README routes readers to the guide front door"
 finish
