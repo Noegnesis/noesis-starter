@@ -826,6 +826,28 @@ Expected: clean push; `git status -sb` shows `## master...origin/master` with no
 
 ---
 
+## Execution notes (2026-06-06, Tasks 1-11)
+
+| Task | Status | Commits |
+|---|---|---|
+| 1-2 Front door | ✅ + review fix (4-persona test coverage) | `70456d2`, `2455e7b`, `108fbbd` |
+| 3 README routing | ✅ | `c700920` |
+| 4-5 Lint + 26 alerts | ✅ (26 insertions, 0 deletions, inventory-exact) | `f2c74e9`, `4c4aa82` |
+| 6 Vault MOC | ✅ + review fix (restored power-user pointers, OS hint, glossary detail) | `bfd4a78`, `53d3c68` |
+| 7-9 Setup guide step | ✅ + review fix (existing-vault disclosure, refresh warning, full recovery hints) | `de0f96e`, `6233592`, `44f1f35`, `706ee0d` |
+| 10 Structure mentions | ✅ | `c513099` |
+| 11 Live verification | ✅ adapted — see below | — |
+
+**Task 11 deviations from plan:**
+
+- `setup.sh` hard-exits on non-macOS (`OSTYPE` gate at setup.sh:110) — the planned Git Bash E2E run is impossible on Windows **by design**. The sh copy logic was instead functionally verified in isolation (scratch vault: correct 10 top-level md incl. MOC, `advanced/` ×4, no README.md, no handoff/). Full sh E2E rides with the existing macOS hardware test (Rina, T11.B).
+- Both live E2E runs used `setup.ps1` with piped stdin. `Read-Host -AsSecureString` (API-key prompt) hangs on piped input, so each run was verified at the post-guide hang point and then killed — the guide branch, vault creation, and skills install all complete before that prompt.
+- Run A (guide=Y → `nv-test-A`): `guide/` exact per spec. Run B (guide=n → `nv-test-B`): no `guide/`. Opt-out honored.
+- Global skills overwrite occurred as known; personal skills were backed up first and restored after (byte-verified).
+- Obsidian render spot-check (plan step 3) deferred to maintainer — callout/Mermaid/collapsed-glossary syntax statically verified; one-time visual check recommended on next vault open.
+
+**Carry-forward:** temp vaults `%LOCALAPPDATA%\Temp\nv-test-A`/`nv-test-B` await manual deletion (session permissions denied recursive delete). Tasks 12-13 gated on user checkpoints.
+
 ## Self-review notes (done at plan time)
 
 - **Spec coverage:** §1 repo fates → Task 12; §2 front door → Tasks 1-3; §3 alerts → Tasks 4-5; §4 guide-in-vault → Tasks 6-9 + 11; §5 tests → Tasks 1, 3, 4, 6, 7; §6 retired-not-ported → no NS-side action needed (obsidian-source/convert.py exist only in SBO, which freezes as-is). Acceptance criteria 1-6 map to Tasks 2, 3, 5, 11, 13, 12 respectively.
