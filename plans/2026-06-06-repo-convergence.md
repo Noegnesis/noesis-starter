@@ -837,6 +837,8 @@ Expected: clean push; `git status -sb` shows `## master...origin/master` with no
 | 7-9 Setup guide step | ✅ + review fix (existing-vault disclosure, refresh warning, full recovery hints) | `de0f96e`, `6233592`, `44f1f35`, `706ee0d` |
 | 10 Structure mentions | ✅ | `c513099` |
 | 11 Live verification | ✅ adapted — see below | — |
+| 12 SBO pointer + archive | ✅ pushed `1f85ab0`, repo archived (isArchived: true) | SBO repo |
+| 13 Final review + push | ✅ opus whole-stack review READY TO PUSH; 60 assertions green; pushed 37ac285..942fae6 | — |
 
 **Task 11 deviations from plan:**
 
@@ -846,7 +848,7 @@ Expected: clean push; `git status -sb` shows `## master...origin/master` with no
 - Global skills overwrite occurred as known; personal skills were backed up first and restored after (byte-verified).
 - Obsidian render spot-check (plan step 3) deferred to maintainer — callout/Mermaid/collapsed-glossary syntax statically verified; one-time visual check recommended on next vault open.
 
-**Carry-forward:** temp vaults `%LOCALAPPDATA%\Temp\nv-test-A`/`nv-test-B` await manual deletion (session permissions denied recursive delete). Tasks 12-13 gated on user checkpoints.
+**Carry-forward:** (1) temp vaults `%LOCALAPPDATA%\Temp\nv-test-A`/`nv-test-B` await manual deletion (session permissions denied recursive delete); (2) one-time Obsidian visual spot-check of an installed `guide/` (callouts, Mermaid, collapsed glossary); (3) setup.sh guide-step E2E rides with the Rina macOS hardware test (T11.B). Convergence itself is SHIPPED — both repos pushed 2026-06-06, SBO archived.
 
 ## Self-review notes (done at plan time)
 
