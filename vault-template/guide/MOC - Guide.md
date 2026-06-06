@@ -66,11 +66,11 @@ graph TD
 6. Going further: [ADHD patterns](advanced/adhd-patterns.md)
 
 ### 🔴 The Power User / Tinkerer
-Read **everything**, 01 → 08, then the advanced layer:
+Read **everything**, 01 → 08. Pay special attention to [04 — Connectors & Tools](04-connectors-and-tools.md) (the load-bearing doctrine), [07 — Sync, Devices & Maintenance](07-sync-devices-and-maintenance.md) (the canonical-device pattern), and [08 — Going Further](08-going-further-advanced.md) (local LLMs, mobile control, the CLI factory). Then the advanced layer:
 [Typed memory](advanced/typed-memory.md) · [MCP wiring](advanced/mcp-wiring.md) · [Agent system](advanced/agent-system.md) · [ADHD patterns](advanced/adhd-patterns.md)
 
 ### Already have a vault?
-[Augmenting an existing vault](augmenting-an-existing-vault.md)
+Don't start from scratch — see [Augmenting an existing vault](augmenting-an-existing-vault.md) (Windows + macOS).
 
 ---
 
@@ -89,12 +89,12 @@ Read **everything**, 01 → 08, then the advanced layer:
 
 > [!NOTE]- Glossary (click to expand)
 > - **Second brain** — a trusted external system that holds what your biological memory shouldn't have to.
-> - **Vault** — Obsidian's name for a folder of Markdown files that *is* your knowledge base.
+> - **Vault** — Obsidian's name for a folder of Markdown files that *is* your knowledge base. Plain files, no lock-in.
 > - **MOC (Map of Content)** — a hub note that links out to related notes; a hand-curated index. (You're reading one.)
 > - **Agent layer** — an AI (here, Claude Code) that can read, write, and act on your vault and connected services.
 > - **CLAUDE.md** — the instruction file that tells the agent who you are and how to behave.
 > - **Skill** — a reusable, packaged workflow the agent can invoke (often via a `/slash-command`).
 > - **MCP (Model Context Protocol)** — a standard for connecting an agent to external services.
-> - **CLI** — a command-line tool. The *preferred* way to connect an agent to a service.
-> - **Capture-fast-sort-slow** — drop everything into one inbox instantly; organize on your own schedule.
+> - **CLI** — a command-line tool. The *preferred* way to connect an agent to a service (cheaper and more reliable than MCP).
+> - **Capture-fast-sort-slow** — drop everything into one inbox instantly; organize on your own schedule, never at capture time.
 > - **Three-layer voice model** — *operational* (AI-assisted) / *journal* (raw, never AI-edited) / *reflection* (curated) kept separate so authorship is never ambiguous.
