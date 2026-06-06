@@ -259,6 +259,7 @@ if ($hasObsidianFolder -or $isNonEmptyDir) {
     Write-Host "  We found existing files here. The script will:"
     Write-Host ""
     Write-Host "  ${Green}+${Reset} Add missing folders (inbox/, daily/, projects/, etc.)"
+    Write-Host "  ${Green}+${Reset} Optionally install the full guide into guide\ (you'll be asked)"
     Write-Host "  ${Green}+${Reset} Install 4 slash commands: /vault-setup /daily /tldr /file-intel"
     Write-Host "  ${Green}+${Reset} Copy helper scripts to scripts/"
     Write-Host "  ${Green}+${Reset} Install skills globally to $env:USERPROFILE\.claude\skills\"
@@ -346,6 +347,9 @@ Write-Host "  ${Dim}as guide\ -- read it in Obsidian, link it from your notes${R
 $guideAnswer = Read-Host "  Include the full guide in your vault? [Y/n]"
 if (-not $guideAnswer) { $guideAnswer = "Y" }
 if ($guideAnswer -match '^[Yy]') {
+    if (Test-Path "$vaultPath\guide") {
+        Write-Host "  ${Orange}WARNING${Reset}  guide\ already exists -- refreshing it (existing guide files are overwritten)"
+    }
     New-Item -ItemType Directory -Force -Path "$vaultPath\guide\advanced" | Out-Null
     $guideFail = $false
     foreach ($f in (Get-ChildItem "$scriptDir\docs" -Filter *.md -File -ErrorAction SilentlyContinue)) {
@@ -361,6 +365,8 @@ if ($guideAnswer -match '^[Yy]') {
     if ($guideFail) {
         Write-Host "  ${Orange}WARNING${Reset}  Some guide files didn't copy. Finish manually:"
         Write-Host "        Copy-Item `"$scriptDir\docs\*.md`" `"$vaultPath\guide\`""
+        Write-Host "        Copy-Item `"$scriptDir\docs\advanced\*.md`" `"$vaultPath\guide\advanced\`""
+        Write-Host "        Copy-Item `"$scriptDir\vault-template\guide\MOC - Guide.md`" `"$vaultPath\guide\`""
     } else {
         Write-Host "  ${Green}OK${Reset} Guide installed -> $vaultPath\guide\ (start at MOC - Guide.md)"
     }

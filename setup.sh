@@ -224,6 +224,7 @@ if [ "$HAS_OBSIDIAN_FOLDER" = true ] || [ "$IS_NON_EMPTY" = true ]; then
   echo -e "  We found existing files here. The script will:"
   echo ""
   echo -e "  ${GREEN}+${RESET} Add missing folders (inbox/, daily/, projects/, etc.)"
+  echo -e "  ${GREEN}+${RESET} Optionally install the full guide into guide/ (you'll be asked)"
   echo -e "  ${GREEN}+${RESET} Install 4 slash commands: /vault-setup /daily /tldr /file-intel"
   echo -e "  ${GREEN}+${RESET} Copy helper scripts to scripts/"
   echo -e "  ${GREEN}+${RESET} Install skills globally to ~/.claude/skills/"
@@ -281,6 +282,9 @@ echo -e "  ${DIM}as guide/ — read it in Obsidian, link it from your notes${RES
 read -rp "  Include the full guide in your vault? [Y/n]: " GUIDE_ANSWER
 GUIDE_ANSWER="${GUIDE_ANSWER:-Y}"
 if [[ "$GUIDE_ANSWER" =~ ^[Yy] ]]; then
+  if [ -d "$VAULT_PATH/guide" ]; then
+    echo -e "  ${ORANGE}⚠${RESET}  guide/ already exists — refreshing it (existing guide files are overwritten)"
+  fi
   mkdir -p "$VAULT_PATH/guide/advanced"
   GUIDE_FAIL=false
   for f in "$SCRIPT_DIR"/docs/*.md; do
@@ -294,7 +298,9 @@ if [[ "$GUIDE_ANSWER" =~ ^[Yy] ]]; then
   cp "$SCRIPT_DIR/vault-template/guide/MOC - Guide.md" "$VAULT_PATH/guide/MOC - Guide.md" 2>/dev/null || GUIDE_FAIL=true
   if [ "$GUIDE_FAIL" = true ]; then
     echo -e "  ${ORANGE}⚠${RESET}  Some guide files didn't copy. Finish manually with:"
-    echo -e "     ${DIM}cp \"$SCRIPT_DIR\"/docs/[0-9]*.md \"$VAULT_PATH/guide/\"${RESET}"
+    echo -e "     ${DIM}cp \"$SCRIPT_DIR\"/docs/*.md \"$VAULT_PATH/guide/\"${RESET}"
+    echo -e "     ${DIM}cp \"$SCRIPT_DIR\"/docs/advanced/*.md \"$VAULT_PATH/guide/advanced/\"${RESET}"
+    echo -e "     ${DIM}cp \"$SCRIPT_DIR/vault-template/guide/MOC - Guide.md\" \"$VAULT_PATH/guide/\"${RESET}"
   else
     echo -e "  ${GREEN}✓${RESET} Guide installed → $VAULT_PATH/guide/ (start at MOC - Guide.md)"
   fi
