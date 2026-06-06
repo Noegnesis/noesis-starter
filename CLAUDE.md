@@ -11,6 +11,7 @@ daily/      ← Daily notes (YYYY-MM-DD.md)
 projects/   ← Active projects and briefs
 research/   ← Notes, synthesis, saved ideas
 archive/    ← Completed work. Never delete, just archive.
+guide/      ← The how-to guide (optional install). Start at MOC - Guide.md.
 ```
 
 ## Context Loading Rules

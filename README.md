@@ -35,7 +35,7 @@ without risking your notes, wikilinks, or Claude Code setup. See
 
 ## What gets installed
 
-Obsidian, Claude Code, Python deps (in an isolated venv), and the core skills (`/vault-setup`, `/daily`, `/tldr`, `/file-intel`) both in this vault and globally.
+Obsidian, Claude Code, Python deps (in an isolated venv), the core skills (`/vault-setup`, `/daily`, `/tldr`, `/file-intel`) both in this vault and globally, and (optionally) the full guide inside your vault as `guide/`.
 
 ## Going deeper
 
@@ -75,7 +75,8 @@ noesis-starter/
 ├── daily/           ← Daily notes (YYYY-MM-DD.md). Your running log.
 ├── projects/        ← Active projects. Claude reads the relevant one before helping.
 ├── research/        ← Synthesized knowledge. Sources, notes, ideas.
-└── archive/         ← Completed work. Never delete — just archive.
+├── archive/         ← Completed work. Never delete — just archive.
+└── guide/           ← The full guide (optional). Start at MOC - Guide.md.
 ```
 
 **The compounding effect:**
