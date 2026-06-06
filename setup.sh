@@ -274,6 +274,32 @@ safe_cp "$SCRIPT_DIR/skills/file-intel/SKILL.md"  "$VAULT_PATH/.claude/skills/fi
 safe_cp "$SCRIPT_DIR/scripts/process_docs_to_obsidian.py" "$VAULT_PATH/scripts/process_docs_to_obsidian.py"
 safe_cp "$SCRIPT_DIR/scripts/process_files_with_gemini.py" "$VAULT_PATH/scripts/process_files_with_gemini.py"
 
+# ─── Guide in the vault (optional, default yes) ──────────────────────────────
+echo ""
+echo -e "  The full guide (8 docs + advanced topics) can live inside your vault"
+echo -e "  ${DIM}as guide/ — read it in Obsidian, link it from your notes${RESET}"
+read -rp "  Include the full guide in your vault? [Y/n]: " GUIDE_ANSWER
+GUIDE_ANSWER="${GUIDE_ANSWER:-Y}"
+if [[ "$GUIDE_ANSWER" =~ ^[Yy] ]]; then
+  mkdir -p "$VAULT_PATH/guide/advanced"
+  GUIDE_FAIL=false
+  for f in "$SCRIPT_DIR"/docs/*.md; do
+    base="$(basename "$f")"
+    [ "$base" = "README.md" ] && continue   # README is the GitHub front door; MOC is the vault one
+    cp "$f" "$VAULT_PATH/guide/$base" 2>/dev/null || GUIDE_FAIL=true
+  done
+  for f in "$SCRIPT_DIR"/docs/advanced/*.md; do
+    cp "$f" "$VAULT_PATH/guide/advanced/$(basename "$f")" 2>/dev/null || GUIDE_FAIL=true
+  done
+  cp "$SCRIPT_DIR/vault-template/guide/MOC - Guide.md" "$VAULT_PATH/guide/MOC - Guide.md" 2>/dev/null || GUIDE_FAIL=true
+  if [ "$GUIDE_FAIL" = true ]; then
+    echo -e "  ${ORANGE}⚠${RESET}  Some guide files didn't copy. Finish manually with:"
+    echo -e "     ${DIM}cp \"$SCRIPT_DIR\"/docs/[0-9]*.md \"$VAULT_PATH/guide/\"${RESET}"
+  else
+    echo -e "  ${GREEN}✓${RESET} Guide installed → $VAULT_PATH/guide/ (start at MOC - Guide.md)"
+  fi
+fi
+
 # Also install skills globally so they work in ANY folder, not just the vault
 mkdir -p "$HOME/.claude/skills/vault-setup" "$HOME/.claude/skills/daily" \
          "$HOME/.claude/skills/tldr" "$HOME/.claude/skills/file-intel"
