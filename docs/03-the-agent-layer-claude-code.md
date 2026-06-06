@@ -38,6 +38,7 @@ What it unlocks over a plain vault:
 2. Open a terminal **in your vault folder** and start it there. The folder you launch from is its working directory — its "world."
 3. Confirm it can see your notes: ask it to list your top-level folders.
 
+> [!TIP]
 > **One agent, one vault**
 > Launch the agent from the vault root so every relative path it reads/writes lands inside the vault. Running it from your home directory and pointing at the vault by absolute path also works, but rooting it in the vault keeps things clean.
 
@@ -76,6 +77,7 @@ A subtle, hard-won refinement: **inline the load-bearing essentials into the glo
 > - Capture fast, sort on a schedule
 > ```
 
+> [!WARNING]
 > **Don't duplicate everything**
 > Inline *essentials*, redirect for *detail*. Full duplication means two files drift out of sync. The shape is "essentials inline + pointer to the full doc," not "copy everything twice."
 
@@ -93,6 +95,7 @@ Claude Code reads a `settings.json` (global at `~/.claude/`, and per-project). T
 
 The reference stack runs **bypass permissions** in the vault — the notes are backed up and version-controllable, so the cost of a bad edit is low and the ergonomic win is large. **Start more conservative** and loosen as you build trust.
 
+> [!TIP]
 > **What else lives in settings.json**
 > Environment variables, a custom statusline, allow/deny lists for specific commands, and **hooks** (automation that fires on events — covered in [05 — Skills & Automation](05-skills-and-automation.md)). You don't need any of it on day one.
 
@@ -106,6 +109,7 @@ Beyond `CLAUDE.md`, the agent can keep a **file-based memory** — small notes-t
 - A `MEMORY.md` index, loaded each session, with a one-line pointer per memory.
 - Before saving, check for an existing memory to update rather than duplicate; delete ones that turn out wrong.
 
+> [!TIP]
 > **What belongs in memory vs the vault**
 > **Vault** = your knowledge. **Memory** = the agent's operating knowledge *about you and your work* that isn't already in the notes. Don't store in memory what the vault already records — store what was non-obvious and would otherwise be re-learned every session.
 

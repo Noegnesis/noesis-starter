@@ -41,6 +41,7 @@ tags:
 
 ## Step 2 — Folder taxonomy
 
+> [!TIP]
 > **Branch here**
 > **Just starting?** Build the **3-folder minimum** and stop. **Know you're going deep** (researcher/power-user)? Skip to the **full taxonomy**.
 
@@ -119,6 +120,7 @@ At the section level, use callouts so authorship is visible inline:
 > The agent's summary or draft, clearly marked as not-you.
 ```
 
+> [!WARNING]
 > **The one rule that protects everything**
 > AI-cleaned text goes **below** the original, never over it. The raw layer is sacred. Decide this now.
 
@@ -147,6 +149,7 @@ Obsidian works great with **zero** community plugins. Add these only as the need
 | **A sync solution** | Cross-device (see [07 — Sync, Devices & Maintenance](07-sync-devices-and-maintenance.md)) | you use more than one device |
 | **A minimal theme** | Readability; some themes style Dataview/list tables as cards | the default feels cramped |
 
+> [!TIP]
 > **Plugin discipline**
 > Every plugin is a dependency that can break on update and adds cognitive load. The litmus test from [01 — Foundations & Philosophy](01-foundations-and-philosophy.md) applies: does it make capture / triage / retrieve / reflect *easier*? If not, don't install it. A common trap is installing overlapping plugins (e.g. two database-like tools) — pick one per job.
 

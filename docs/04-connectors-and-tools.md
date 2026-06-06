@@ -37,6 +37,7 @@ Here's why, and it's not arbitrary:
 - **API loses** for agents because it was built for *human-written code* that wraps, parses, and formats the response. Make the agent do all that and you burn tokens for work the API consumer was supposed to do.
 - **MCP loses** for two compounding reasons: its outputs are still raw API payloads (just routed differently), and loading many MCP servers adds tool definitions the agent carries around. Per-invocation cost is the killer (~35× a CLI on the same task).
 
+> [!WARNING]
 > **The default everyone gets wrong**
 > "Just install the MCP" is the *most expensive* option almost every time. Reach for it last, not first.
 
@@ -60,6 +61,7 @@ Want the agent to use Service X?
                                              → No  → Build a CLI yourself.
 ```
 
+> [!TIP]
 > **"Hard-code the one endpoint"**
 > You rarely need a service's *whole* API. If you only ever "create a calendar event," write a 20-line script that does exactly that and nothing else. The agent calls your script, not the sprawling API.
 
@@ -90,6 +92,7 @@ These are the kinds of command-line tools this stack leans on. Add them as needs
 | **Workspace CLI** (calendar/email/drive) | One CLI covering an entire productivity suite | Replaces several heavy MCP connectors at once |
 | **Media / activity pulls** | Imports listening/reading/activity history into the vault | Auto-capturing the parts of life worth logging |
 
+> [!TIP]
 > **Wrap your most-used CLI calls in skills**
 > A CLI you invoke often deserves a [skill](05-skills-and-automation.md) wrapper so natural language ("summarize this folder") maps to the right command. The CLI is the engine; the skill is the steering wheel.
 

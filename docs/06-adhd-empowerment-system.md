@@ -30,6 +30,7 @@ A second brain works here because it **externalizes** those functions:
 | Working memory | Holds everything so you don't have to |
 | Self-monitoring | Audits itself for drift and stale state |
 
+> [!TIP]
 > **Design principle for this whole doc**
 > Don't build a system that requires you to be disciplined to use it. Build one that **works even on your worst day** — and rewards, rather than punishes, the days you fall off.
 
@@ -66,6 +67,7 @@ Pair it with a weekly review ([/weekly](05-skills-and-automation.md)) so nothing
 
 The single most ADHD-aware behavior to bake into your agent (via [CLAUDE.md](03-the-agent-layer-claude-code.md)):
 
+> [!IMPORTANT]
 > **Put this in your CLAUDE.md**
 > *"When I seem stuck or avoidant, offer the smallest possible next action — not a plan."*
 
@@ -85,6 +87,7 @@ Habit maintenance is dopamine-poor, which is exactly why it's hard. Wiring the v
 - The agent reads/writes them, so "what are my dailies?" and "mark journaling done" happen in the same place you already work.
 - Streaks create *just enough* loss-aversion to keep the loop alive without becoming a guilt machine.
 
+> [!TIP]
 > **Keep it kind**
 > Gamification should reward action, not punish lapses. If a streak-break makes you abandon the whole system, the system is too brittle. Tune for "easy to restart," not "expensive to break."
 
@@ -118,6 +121,7 @@ ADHD means you *will* fall off. The system has to survive that:
 - **The agent re-orients you.** "I've been away for two weeks, what did I drop?" is a question the system can answer from its own notes.
 - **Self-audit** ([07 — Sync, Devices & Maintenance](07-sync-devices-and-maintenance.md)) catches drift so a lapse in upkeep doesn't quietly rot the system.
 
+> [!TIP]
 > **The forgiveness test**
 > Imagine ignoring the system for a month. Can you return in 10 minutes and know exactly where you are? If yes, it's ADHD-proof. If returning feels like starting over, simplify until it doesn't.
 

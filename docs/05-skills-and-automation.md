@@ -44,6 +44,7 @@ Start with a small, high-leverage set. These map directly onto the four jobs fro
 | **A capture/sort skill** | Triage | Processes the inbox: classifies each item, proposes a home, files on approval |
 | **A self-audit skill** | Maintain | Checks the system itself for drift/staleness (see [07 — Sync, Devices & Maintenance](07-sync-devices-and-maintenance.md)) |
 
+> [!TIP]
 > **Build the daily loop first**
 > If you do nothing else, get a `/daily` working. Surfacing deadlines every morning is the single highest-leverage automation — it's the thing a passive vault *cannot* do for you, and it's the backbone of the [ADHD system](06-adhd-empowerment-system.md).
 
@@ -74,6 +75,7 @@ The fastest way to a new skill: **do the workflow once manually, then ask the ag
 > **A good SKILL.md description is a *trigger*, not a title**
 > Bad: "Meeting notes skill." Good: "Use when the user shares a meeting transcript or says 'write up this meeting' — summarizes, extracts action items, files under the relevant project." The description is how the agent *decides* to use it, so write it as a when-to-fire rule.
 
+> [!WARNING]
 > **DRY your skills**
 > Before writing a new skill, check whether an existing one already covers it. A sprawl of near-duplicate skills is as bad as a sprawl of plugins — the agent gets ambiguous matches. One skill per distinct job.
 
@@ -88,6 +90,7 @@ Examples a second brain might use:
 - **After a note is written** — run a formatter or update an index.
 - **A nudge** — remind you to journal if today's entry is empty.
 
+> [!TIP]
 > **Memory/preferences can't enforce behavior — hooks can**
 > "From now on, always do X after Y" is a *hook*, not a note-to-self. If you need something to happen reliably and automatically, it belongs in settings/hooks, not in a CLAUDE.md request the agent might forget under load.
 

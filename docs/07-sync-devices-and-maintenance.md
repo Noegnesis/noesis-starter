@@ -18,6 +18,7 @@ tags:
 
 ## Two things sync, and they're different
 
+> [!WARNING]
 > **The mistake almost everyone makes**
 > Syncing your **notes** is not the same as syncing your **agent setup**. People sync the vault, switch devices, and discover the agent behaves completely differently because its config (CLAUDE.md, skills, settings) lives *outside* the vault and didn't come along.
 
@@ -42,6 +43,7 @@ Options, roughly in order of "just works":
 - **A cloud-drive folder** (Drive/Dropbox/iCloud) — simplest, but watch for conflict files and partial syncs when two devices edit at once.
 - **Git** — version history for free, great for the technically inclined, awkward for live mobile editing.
 
+> [!TIP]
 > **Decide before you create the vault**
 > Where the vault lives ([02 — Obsidian Vault Setup](02-obsidian-vault-setup.md) step 1) determines your sync options. Moving a vault later breaks absolute paths in scripts and configs. Choose the location with sync in mind on day one.
 
@@ -64,6 +66,7 @@ A "Setup" state doc in the vault (skills manifest, settings, install steps)
 2. **Keep a "Setup" state doc in the vault** — a single Markdown file that records: which skills exist (with their content or a manifest), the settings.json contents, the global CLAUDE.md, and exact install steps. Because it's *in the vault*, it syncs everywhere automatically and is readable by the agent on any device.
 3. **Mirror to other devices** by following that doc. When you set up a new machine, you (or the agent) read the Setup doc and reproduce the state.
 
+> [!TIP]
 > **The state doc is the secret**
 > Treat it as the single source of truth for "how is this system built." When something changes on the canonical device, update the doc in the same breath. New device, recovered device, or just "wait, what did I configure?" — all answered by one file that travels with your notes.
 

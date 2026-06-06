@@ -13,6 +13,7 @@ tags:
 
 ← [Start Here](../README.md) · prev [07 — Sync, Devices & Maintenance](07-sync-devices-and-maintenance.md)
 
+> [!WARNING]
 > **Read this first**
 > Everything here is **optional and additive**. Do not build any of it to feel "complete." Add a module only when a specific, recurring friction makes the basics insufficient. Premature advanced tooling is how second brains die of complexity. (The litmus test from [01 — Foundations & Philosophy](01-foundations-and-philosophy.md) still rules.)
 
@@ -24,6 +25,7 @@ From [04 — Connectors & Tools (CLI → API → MCP)](04-connectors-and-tools.m
 
 **When it's worth it:** a service you hit repeatedly that has no agent-friendly interface (a school portal, a niche SaaS, an internal tool). Build the CLI once; wrap it in a skill; never fight the raw service again.
 
+> [!TIP]
 > **This is the endgame of the connector doctrine**
 > CLI → API → MCP, and if none exist, *make the CLI*. It keeps your whole tool surface fast and reliable, and portable across models (Module B).
 
@@ -107,6 +109,7 @@ Solid basics: vault + agent + core skills
   → Module F: publish (when you want output)
 ```
 
+> [!TIP]
 > **One at a time**
 > Add a single module, live with it for a couple of weeks, and only then consider the next. Each one is a maintenance commitment. The goal was never the most elaborate system — it's the one you actually trust and use.
 

@@ -30,6 +30,7 @@ CAPTURE → TRIAGE → RETRIEVE → REFLECT -.-> CAPTURE
 | **Retrieve** | "Can I find it again when it matters?" | A graveyard of notes you never reopen |
 | **Reflect** | "What does all this *mean* for what I do next?" | Hoarding information that never becomes judgment |
 
+> [!TIP]
 > **The litmus test for any tool or habit**
 > Does it make one of these four jobs **easier**? If not, it's decoration. This single question kills most of the over-engineering that sinks new second brains.
 
@@ -80,6 +81,7 @@ Once an AI agent can write into your vault, you must be able to tell, instantly 
 
 Voice attribution is enforced with a frontmatter field (e.g. `voice: raw | ai-cleaned | ai-mixed | ai-generated`) and section-level callouts (`> [!raw]` for your words, `> [!ai]` for the agent's). An AI-cleaned version goes *below* the original — it never overwrites it.
 
+> [!WARNING]
 > **Why this matters more than it sounds**
 > The first time an agent "helpfully" rewrites your raw journal entry into polished prose, you lose the original forever and you stop trusting the system with anything personal. Decide the voice rules *before* you let an agent write. This is the one foundation that's expensive to retrofit.
 
@@ -94,6 +96,7 @@ You're not inventing this. The stack borrows the best of several traditions — 
 - **Zettelkasten** (Niklas Luhmann) — atomic, densely-linked notes. The source of the "links and MOCs over folders" instinct.
 - **Bullet Journal** (Ryder Carroll) — rapid logging and migration. The source of "capture fast, triage on a schedule," and the periodic-note rhythm (daily / weekly reviews) in [05 — Skills & Automation](05-skills-and-automation.md).
 
+> [!TIP]
 > **Don't pick one orthodoxy and obey it**
 > Each tradition over-indexes on one of the four jobs. Take the principle, leave the dogma. The stack is deliberately a hybrid.
 
