@@ -67,7 +67,7 @@ graph TD
 
 ### 🔴 The Power User / Tinkerer
 Read **everything**, 01 → 08. Pay special attention to [04 — Connectors & Tools](04-connectors-and-tools.md) (the load-bearing doctrine), [07 — Sync, Devices & Maintenance](07-sync-devices-and-maintenance.md) (the canonical-device pattern), and [08 — Going Further](08-going-further-advanced.md) (local LLMs, mobile control, the CLI factory). Then the advanced layer:
-[Typed memory](advanced/typed-memory.md) · [MCP wiring](advanced/mcp-wiring.md) · [Agent system](advanced/agent-system.md) · [ADHD patterns](advanced/adhd-patterns.md)
+[Typed memory](advanced/typed-memory.md) · [MCP wiring](advanced/mcp-wiring.md) · [Agent system](advanced/agent-system.md) · [ADHD patterns](advanced/adhd-patterns.md) · [Data pipelines](advanced/data-pipelines.md)
 
 ### Already have a vault?
 Don't start from scratch — see [Augmenting an existing vault](augmenting-an-existing-vault.md) (Windows + macOS).

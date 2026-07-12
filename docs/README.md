@@ -88,7 +88,7 @@ Each path is a **reading order**. Read the listed docs in sequence; ignore the r
 - [04 — Connectors & Tools (CLI → API → MCP)](04-connectors-and-tools.md) — the load-bearing doctrine
 - [07 — Sync, Devices & Maintenance](07-sync-devices-and-maintenance.md) — the canonical-device pattern + self-audit
 - [08 — Going Further (Advanced)](08-going-further-advanced.md) — local LLMs, mobile control, the CLI factory
-- [advanced/typed-memory.md](advanced/typed-memory.md) · [advanced/mcp-wiring.md](advanced/mcp-wiring.md) · [advanced/agent-system.md](advanced/agent-system.md)
+- [advanced/typed-memory.md](advanced/typed-memory.md) · [advanced/mcp-wiring.md](advanced/mcp-wiring.md) · [advanced/agent-system.md](advanced/agent-system.md) · [advanced/data-pipelines.md](advanced/data-pipelines.md)
 
 ### Already have a vault?
 Don't start from scratch — see **[Augmenting an existing vault](augmenting-an-existing-vault.md)** (Windows + macOS).
@@ -112,6 +112,7 @@ Don't start from scratch — see **[Augmenting an existing vault](augmenting-an-
 | [advanced/mcp-wiring.md](advanced/mcp-wiring.md) | Optional connectors (calendar, mail) — costs and trade-offs |
 | [advanced/agent-system.md](advanced/agent-system.md) | Multi-agent routing patterns |
 | [advanced/adhd-patterns.md](advanced/adhd-patterns.md) | Deeper executive-function scaffolds |
+| [advanced/data-pipelines.md](advanced/data-pipelines.md) | Wire any service's live data into your daily note — the CLI pipeline recipe |
 
 ---
 
