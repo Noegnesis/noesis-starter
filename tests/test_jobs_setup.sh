@@ -6,6 +6,11 @@ HERE="$(cd "$(dirname "$0")" && pwd)"; ROOT="$(cd "$HERE/.." && pwd)"
 PY="$(command -v python3 || command -v python || true)"
 JOBSLIB="$ROOT/scripts/jobs/jobslib.py"
 
+assert_file_exists "$ROOT/scripts/jobs/templates/resume-fragment.md" "resume fragment template ships"
+frag="$(cat "$ROOT/scripts/jobs/templates/resume-fragment.md")"
+assert_contains "$frag" "{lane}" "fragment template is tokenized by lane"
+assert_contains "$frag" "{anchor_bullets}" "fragment template carries anchor slots"
+
 if [ -z "$PY" ]; then
   pass "skipped jobs-setup behavior (no python on PATH)"
 else
