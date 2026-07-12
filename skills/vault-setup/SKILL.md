@@ -130,6 +130,8 @@ One manual step:
 
 Slash commands: /daily  /tldr  /[role]
 
+Job hunting? Run /jobs-setup to stand up the job-search pipeline (optional).
+
 Have files to import?
   python scripts/process_docs_to_obsidian.py ~/your-files inbox/
   Then: "Sort everything in inbox/ into the right folders"

@@ -44,3 +44,4 @@ When writing anything:
 - /file-intel    — Process any folder of files through Gemini, get Obsidian-ready summaries
 - /vault-health  — Audit vault content: broken links, orphans, stale MOCs
 - /jobs          — Ingest a posting, score fit, tailor a kit, and track it
+- /jobs-setup    — Onboarding interview: builds your jobs config, fragments, Facts Ledger

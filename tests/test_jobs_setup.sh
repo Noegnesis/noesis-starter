@@ -20,6 +20,17 @@ assert_contains "$ss" ".env" "skill routes secrets to .env"
 assert_contains "$ss" "gitignored" "skill notes .env is gitignored"
 assert_contains "$ss" "build it" "skill gates the build on confirmation"
 
+claude_md="$(cat "$ROOT/CLAUDE.md")"
+assert_contains "$claude_md" "/jobs-setup" "CLAUDE.md lists /jobs-setup"
+vs="$(cat "$ROOT/skills/vault-setup/SKILL.md")"
+assert_contains "$vs" "/jobs-setup" "vault-setup offers the jobs onboarding"
+sh_body="$(cat "$ROOT/setup.sh")"
+assert_contains "$sh_body" "skills/jobs-setup" "setup.sh ships the skill"
+assert_contains "$sh_body" "8 slash commands" "setup.sh counts 8 commands"
+ps_body="$(cat "$ROOT/setup.ps1")"
+assert_contains "$ps_body" "jobs-setup" "setup.ps1 ships the skill"
+assert_contains "$ps_body" "8 slash commands" "setup.ps1 counts 8 commands"
+
 if [ -z "$PY" ]; then
   pass "skipped jobs-setup behavior (no python on PATH)"
 else
