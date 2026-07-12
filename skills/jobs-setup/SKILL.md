@@ -65,6 +65,8 @@ Type "build it" to write these, or tell me what to change. Wait for confirmation
 3. **Fragments:** create `applications/_fragments/`; for each lane, fill the
    `{placeholders}` in `scripts/jobs/templates/resume-fragment.md` from the profile
    plus that lane's anchors, and write it to the path in the config's `fragments` map.
+   If the template file is missing, write each fragment fresh from the profile plus
+   that lane's anchors instead.
 4. **Facts Ledger:** add one row per anchor to the table in
    `applications/Facts Ledger.md` (claim, exact wording, where true,
    bullseye/stretch, lane), and list their never-claim items under **Never claim:**.

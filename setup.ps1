@@ -352,6 +352,9 @@ foreach ($jobsFile in @("jobslib.py", "scaffold.py")) {
 if (Test-Path "$scriptDir\scripts\jobs\templates\kit-hub.md") {
     Copy-Item "$scriptDir\scripts\jobs\templates\kit-hub.md" "$vaultPath\scripts\jobs\templates\" -Force
 }
+if (Test-Path "$scriptDir\scripts\jobs\templates\resume-fragment.md") {
+    Copy-Item "$scriptDir\scripts\jobs\templates\resume-fragment.md" "$vaultPath\scripts\jobs\templates\" -Force
+}
 
 # applications/ scaffold (Facts Ledger, config template, trackers) -- never
 # overwrite on re-run, since it may already hold the user's real kits

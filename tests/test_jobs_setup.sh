@@ -30,6 +30,8 @@ assert_contains "$sh_body" "8 slash commands" "setup.sh counts 8 commands"
 ps_body="$(cat "$ROOT/setup.ps1")"
 assert_contains "$ps_body" "jobs-setup" "setup.ps1 ships the skill"
 assert_contains "$ps_body" "8 slash commands" "setup.ps1 counts 8 commands"
+assert_contains "$sh_body" "resume-fragment" "setup.sh ships the fragment template"
+assert_contains "$ps_body" "resume-fragment" "setup.ps1 ships the fragment template"
 
 if [ -z "$PY" ]; then
   pass "skipped jobs-setup behavior (no python on PATH)"

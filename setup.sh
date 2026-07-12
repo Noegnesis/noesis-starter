@@ -283,6 +283,7 @@ mkdir -p "$VAULT_PATH/scripts/jobs/templates"
 safe_cp "$SCRIPT_DIR/scripts/jobs/jobslib.py"           "$VAULT_PATH/scripts/jobs/jobslib.py"
 safe_cp "$SCRIPT_DIR/scripts/jobs/scaffold.py"          "$VAULT_PATH/scripts/jobs/scaffold.py"
 safe_cp "$SCRIPT_DIR/scripts/jobs/templates/kit-hub.md" "$VAULT_PATH/scripts/jobs/templates/kit-hub.md"
+safe_cp "$SCRIPT_DIR/scripts/jobs/templates/resume-fragment.md" "$VAULT_PATH/scripts/jobs/templates/resume-fragment.md"
 
 # applications/ scaffold (Facts Ledger, config template, trackers) — never
 # overwrite on re-run, since it may already hold the user's real kits
