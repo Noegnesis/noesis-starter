@@ -66,5 +66,45 @@ EOF
   miss_out="$("$PY" "$JOBSLIB" validate "$TMP/nope.md" 2>&1)"; miss_rc=$?
   assert_eq "$miss_rc" "1" "validate exits 1 when the config cannot load"
   assert_contains "$miss_out" "error:" "validate reports the load error"
+
+  # --- acceptance: a completed-interview persona config validates + scaffolds ---
+  P="$TMP/persona"; mkdir -p "$P/applications/_jobs" "$P/applications/_fragments"
+  cat > "$P/applications/_jobs/config.md" <<'EOF'
+# Jobs config
+```yaml
+profile:
+  name: Fixture Friend
+  contact: fixture@example.com
+  location: Remote
+lanes:
+  - key: track-a
+    label: Track A
+    description: first fixture track
+    anchor_keys: [anchor-1]
+  - key: track-b
+    label: Track B
+    description: second fixture track
+    anchor_keys: [anchor-1]
+anchors:
+  - key: anchor-1
+    title: Sample Project
+    one_line: Built a sample thing end to end
+    metrics: "3 users"
+    lane_keys: [track-a, track-b]
+voice_rules: "terse"
+facts_ledger: "applications/Facts Ledger.md"
+fragments:
+  track-a: "applications/_fragments/Resume - track-a (paste-ready).md"
+  track-b: "applications/_fragments/Resume - track-b (paste-ready).md"
+paths:
+  vault_root: null
+tracker: markdown
+```
+EOF
+  pcfg="$P/applications/_jobs/config.md"
+  pval="$("$PY" "$JOBSLIB" validate "$pcfg")"
+  assert_contains "$pval" "config OK: 2 lane(s)" "persona config validates with both lanes"
+  "$PY" "$ROOT/scripts/jobs/scaffold.py" --config "$pcfg" --org "Gamma Inc" --role "Test Role" --lane track-b --execute >/dev/null
+  assert_file_exists "$P/applications/Gamma Inc Test Role/Gamma Inc Test Role.md" "persona config drives the scaffolder"
 fi
 finish
