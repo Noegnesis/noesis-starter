@@ -134,6 +134,10 @@ A second brain only surfaces deadlines if you give it a daily heartbeat. The sta
 - **Weekly review** — wins, lessons, next week's plan (not in the starter set — build your own skill following the pattern in [05 — Skills & Automation](05-skills-and-automation.md)).
 - **Journal** (`identity/journal/...`) — your raw voice, separate, AI-untouched.
 
+> [!TIP]
+> **The daily note is also a same-day hub**
+> Give it a `## Linked Today` section, and every substantive note created that day gets a `[[link]]` there (grouped by folder) — added at creation time by the agent, swept for stragglers by `/daily`. Retrieval by *when* is the one axis folders can't give you: months later, "that idea from the week of the offsite" is one daily note away. Keep it one-way (daily → note) so notes never need to know about the hub.
+
 Start manual (a daily note template you fill in). Automate it once the agent layer is in place.
 
 ---

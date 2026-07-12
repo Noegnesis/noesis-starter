@@ -88,8 +88,8 @@ If Obsidian did not open automatically:
 Write a first-person `CLAUDE.md` with: `## Who I Am` (2-3 specific sentences from what they told you), `## My Vault Structure` (folder tree + one-line purpose each), `## How I Work` (3-4 inferred bullets), `## Context Rules` (decision -> which folder; person/project -> which folder; writing -> read recent daily notes; inbox -> ask to sort).
 
 ### Write skill files
-- `.claude/skills/daily/SKILL.md`: read/create today's daily note, check `inbox/`, surface top 3, ask what we're working on.
-- `.claude/skills/tldr/SKILL.md`: summarize decisions / things to remember / next actions, save to the right folder, update `memory.md`.
+- `.claude/skills/daily/SKILL.md`: read/create today's daily note (with a `## Linked Today` section), check `inbox/`, reconcile `## Linked Today` with any notes created today, surface top 3, ask what we're working on.
+- `.claude/skills/tldr/SKILL.md`: summarize decisions / things to remember / next actions, save to the right folder, link the saved note under today's `## Linked Today`, update `memory.md`.
 - Role skill (write a SKILL.md that does the described job): Business Owner -> `standup` (briefing across projects, decisions, people); Developer -> `project` (load a project's full context); Consultant -> `client` (load a client's full context); Creator -> `content` (read the content folder, calibrate voice, develop an idea); Student -> `research` (pull all notes on a topic and synthesize).
 
 ### Write memory.md

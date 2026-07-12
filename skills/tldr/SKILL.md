@@ -14,5 +14,9 @@ Save to the most relevant folder based on the topic discussed.
 - Research → research/
 - General → daily/ with today's date
 
+After saving (unless it went into today's daily note itself), add a [[link]]
+to the new note under today's daily note's "## Linked Today" section — create
+the section if missing. The daily note is the same-day hub.
+
 Also update memory.md at the vault root with any new patterns or 
 preferences discovered in this session.

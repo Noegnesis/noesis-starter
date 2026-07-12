@@ -28,6 +28,10 @@ When writing anything:
 ## How to Maintain This Vault
 - New files from outside → inbox/ first, sort later
 - Daily notes → daily/YYYY-MM-DD.md
+- When you create a substantive note anywhere in the vault → add a [[link]] to it
+  under today's daily note's "## Linked Today" section (create the section if
+  missing), grouped by top-level folder. The daily note is the same-day hub:
+  one place that answers "what did I make today?" (/daily sweeps for anything missed)
 - Completed work → archive/ (never delete)
 - Update this file whenever your conventions change
 
