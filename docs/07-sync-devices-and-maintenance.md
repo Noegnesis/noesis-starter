@@ -113,6 +113,12 @@ Bake these thresholds into [CLAUDE.md](03-the-agent-layer-claude-code.md) so the
 - **Watch for sync artifacts** — conflict-copy files, duplicate names; clean them periodically.
 - **Prune dead links and stale memories** — a quick pass during the weekly review.
 
+The starter automates the detection half: `/vault-health` scans for broken
+wikilinks, orphaned notes, stale MOCs, and inbox backlog (read-only, with a
+safe cosmetic auto-fix), and `/weekly` appends its one-line pulse so trends
+surface without you asking. Self-audit above watches the *system*; this
+watches the *content*.
+
 ---
 
 ## What "done with this doc" looks like

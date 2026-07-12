@@ -42,7 +42,8 @@ Start with a small, high-leverage set. These map directly onto the four jobs fro
 | **`/weekly`** | Reflect | A weekly review seeded from the week's daily notes: wins, lessons, carry-overs (carry / drop / archive each), next week's top 3 — plus a one-line vault-health pulse if the scanner is installed |
 | **`/tldr`** | Capture | Saves a summary of the current session (decisions, things to remember, next actions) into the right folder |
 | **A capture/sort skill** | Triage | Processes the inbox: classifies each item, proposes a home, files on approval |
-| **A self-audit skill** | Maintain | Checks the system itself for drift/staleness (see [07 — Sync, Devices & Maintenance](07-sync-devices-and-maintenance.md)) |
+| **`/vault-health`** | Maintain | Audits the vault's *content*: broken wikilinks, orphaned notes, stale MOCs, inbox backlog — read-only, with a safe cosmetic auto-fix + undo log |
+| **A self-audit skill** | Maintain | Checks the *system* itself (skills, settings, config) for drift/staleness (see [07 — Sync, Devices & Maintenance](07-sync-devices-and-maintenance.md)) |
 
 > [!TIP]
 > **Build the daily loop first**
