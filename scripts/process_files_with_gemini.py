@@ -43,6 +43,8 @@ if not API_KEY:
 # MODEL: which Gemini model to use
 #   "gemini-3-flash-preview"  — fast, cheap, great for most files  ← default
 #   "gemini-3-pro-preview"    — slower, higher quality on dense docs
+#   Override without editing this file: set GEMINI_MODEL in your .env
+#   (preview model names get retired — if Google drops this one, that's the fix)
 #
 # OUTPUT_DIR: where summaries are saved (default: outputs/file_summaries/YYYY-MM-DD/)
 #
@@ -55,7 +57,7 @@ if not API_KEY:
 #   "Always extract the author name and date if present"
 # ─────────────────────────────────────────────
 
-MODEL = "gemini-3-flash-preview"
+MODEL = os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview")
 
 BASE_DIR = Path(__file__).parent.parent
 TODAY = date.today().isoformat()
