@@ -1,6 +1,6 @@
 filters:
   and:
-    - type == "application"
+    - 'type == "application"'
 views:
   - type: table
     name: Pipeline

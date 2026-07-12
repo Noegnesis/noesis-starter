@@ -75,6 +75,8 @@ def main(argv=None):
     req_suffix = f" ({args.req_id})" if args.req_id else ""
     source_line = (f"- Source: {args.source}" if args.source
                    else "- (paste role context / comp / org notes here)")
+    jd_line = ("[[Job Description]]" if args.jd_file
+               else "(attach one with --jd-file, or paste below)")
     values = {
         "org": yaml_safe(args.org), "role": yaml_safe(args.role),
         "req_id": yaml_safe(args.req_id), "lane": args.lane, "status": args.status,
@@ -83,7 +85,7 @@ def main(argv=None):
         "deadline": args.deadline, "apply_target": args.apply_target,
         "source": yaml_safe(args.source), "warm_path": yaml_safe(args.warm_path),
         "created": today(), "req_suffix": req_suffix, "source_line": source_line,
-        "stable_key": "",
+        "jd_line": jd_line, "stable_key": "",
     }
     hub_text = build_hub(values)
 

@@ -7,8 +7,8 @@ lane: {lane}
 status: {status}
 location: "{location}"
 remote: {remote}
-deadline: {deadline}
-apply_target: {apply_target}
+deadline: "{deadline}"
+apply_target: "{apply_target}"
 source: "{source}"
 stable_key: "{stable_key}"
 warm_path: "{warm_path}"
@@ -35,7 +35,7 @@ voice: ai-generated
 
 ## Materials
 - Résumé: tailored `Resume - {lane} (paste-ready).md`
-- JD: [[Job Description]]
+- JD: {jd_line}
 
 ## Next actions
 - [ ] Tailor the {lane} résumé for this role

@@ -14,6 +14,7 @@ assert_file_exists "$VT/Facts Ledger.md" "facts ledger template ships"
 assert_file_exists "$VT/Cover Letter - Base.md" "cover letter base ships"
 assert_file_exists "$VT/Applications.base" "bases tracker ships"
 assert_file_exists "$VT/Applications.md" "markdown fallback tracker ships"
+assert_file_exists "$VT/_sample-kit/Sample Co Sample Role/Sample Co Sample Role.md" "sample kit ships"
 tmpl="$(cat "$VT/_jobs/config.md")"
 assert_contains "$tmpl" "track-1" "config template uses placeholder lanes"
 

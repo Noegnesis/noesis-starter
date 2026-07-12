@@ -7,8 +7,8 @@ lane: track-1
 status: interested
 location: ""
 remote: false
-deadline: null
-apply_target: null
+deadline: ""
+apply_target: ""
 source: ""
 stable_key: ""
 warm_path: ""
@@ -23,7 +23,7 @@ voice: ai-generated
 
 ## Status
 - **Lane:** track-1  ·  **Status:** interested
-- **Apply target:** null  ·  **Close:** null
+- **Apply target:**   ·  **Close:** 
 - **Location:**  (remote: false)
 - **Warm path:** 
 
@@ -35,8 +35,8 @@ voice: ai-generated
 
 ## Materials
 - Résumé: tailored `Resume - track-1 (paste-ready).md`
-- JD: [[Job Description]]
+- JD: (attach one with --jd-file, or paste below)
 
 ## Next actions
 - [ ] Tailor the track-1 résumé for this role
-- [ ] Apply by null
+- [ ] Apply by 
