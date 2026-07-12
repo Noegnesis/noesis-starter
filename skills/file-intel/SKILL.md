@@ -35,13 +35,15 @@ Show the terminal output as it runs so the user can see files being processed li
 
 ## Step 3: Open the output
 
-After the script completes, open the output folder:
+After the script completes, open the output folder with the command for the current OS:
 
 ```bash
-open "outputs/file_summaries/YYYY-MM-DD/"
+open "outputs/file_summaries/YYYY-MM-DD/"        # macOS
+explorer "outputs\file_summaries\YYYY-MM-DD"     # Windows
+xdg-open "outputs/file_summaries/YYYY-MM-DD/"    # Linux
 ```
 
-Replace `YYYY-MM-DD` with today's date from the script output.
+Replace `YYYY-MM-DD` with today's date from the script output. If the folder doesn't open, just tell the user the path — never fail silently on this step.
 
 ## Step 4: Report back
 
