@@ -90,5 +90,14 @@ EOF
   # invalid lane is rejected against config lanes
   badlane="$("$PY" "$SC" --config "$cfg" --org "X" --role "Y" --lane not-a-lane 2>&1 || true)"
   assert_contains "$badlane" "not-a-lane" "unknown lane is rejected"
+
+  # --- end-to-end: fresh user copies the template, scaffolds a kit ---
+  E2E="$(mktemp -d)";
+  mkdir -p "$E2E/applications/_jobs"
+  cp "$ROOT/vault-template/applications/_jobs/config.md" "$E2E/applications/_jobs/config.md"
+  "$PY" "$SC" --config "$E2E/applications/_jobs/config.md" \
+     --org "Beta Corp" --role "Sensor Engineer" --lane track-1 --execute >/dev/null 2>&1
+  assert_file_exists "$E2E/applications/Beta Corp Sensor Engineer/Beta Corp Sensor Engineer.md" "fresh user scaffolds a kit from the shipped template"
+  rm -rf "$E2E"
 fi
 finish
