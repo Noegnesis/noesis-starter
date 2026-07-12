@@ -28,7 +28,7 @@ voice: ai-generated
 - **Warm path:** 
 
 ## The role
-
+- (paste role context / comp / org notes here)
 
 ## Requirements vs. fit
 - (map JD requirements -> your evidence here)
