@@ -52,5 +52,19 @@ EOF
   bad="$("$PY" -c "import sys; sys.path.insert(0,'$JOBS_PATH'); import jobslib as j; print(j.validate_config(j.load_config('$bad_cfg')))")"
   assert_contains "$bad" "profile.name is required" "validate flags missing name"
   assert_contains "$bad" "at least one lane is required" "validate flags missing lanes"
+
+  # --- scaffold.py (config-driven) ---
+  SC="$ROOT/scripts/jobs/scaffold.py"
+  assert_file_exists "$SC" "scaffold ships"
+  # dry-run: prints preview, writes nothing
+  dry="$("$PY" "$SC" --config "$cfg" --org "Acme Co" --role "Widget Engineer" --lane track-1)"
+  assert_contains "$dry" "dry-run" "scaffold dry-runs by default"
+  assert_eq "$([ -d "$TMP/applications/Acme Co Widget Engineer" ] && echo yes || echo no)" "no" "dry-run writes nothing"
+  # execute: writes the kit hub
+  "$PY" "$SC" --config "$cfg" --org "Acme Co" --role "Widget Engineer" --lane track-1 --execute >/dev/null
+  assert_file_exists "$TMP/applications/Acme Co Widget Engineer/Acme Co Widget Engineer.md" "execute writes the hub"
+  # invalid lane is rejected against config lanes
+  badlane="$("$PY" "$SC" --config "$cfg" --org "X" --role "Y" --lane not-a-lane 2>&1 || true)"
+  assert_contains "$badlane" "not-a-lane" "unknown lane is rejected"
 fi
 finish
