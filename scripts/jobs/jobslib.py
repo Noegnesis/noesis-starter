@@ -4,6 +4,8 @@
 Loads a per-user config (a fenced YAML block inside a .md), validates it,
 resolves paths for vault or standalone use, and reads secrets from .env.
 No personal data lives here — everything comes from the user's config.
+
+CLI: python jobslib.py validate [applications/_jobs/config.md]
 """
 import os
 import re
@@ -95,3 +97,32 @@ def load_secret(name, env_path=None):
                     if line.startswith(name + "="):
                         return line.split("=", 1)[1].strip().strip('"\'')
     return os.environ.get(name)
+
+
+def _main(argv=None):
+    import argparse
+    p = argparse.ArgumentParser(description="jobs config utilities")
+    sub = p.add_subparsers(dest="cmd", required=True)
+    v = sub.add_parser("validate", help="load + validate a config .md; exit 0 iff clean")
+    v.add_argument("config", nargs="?", default=DEFAULT_CONFIG_REL)
+    args = p.parse_args(argv)
+
+    import sys
+    try:
+        cfg = load_config(args.config)
+    except ConfigError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 1
+    problems = validate_config(cfg)
+    if problems:
+        for prob in problems:
+            print(f"problem: {prob}")
+        return 1
+    keys = lane_keys(cfg)
+    print(f"config OK: {len(keys)} lane(s): {', '.join(keys)}")
+    return 0
+
+
+if __name__ == "__main__":  # pragma: no cover
+    import sys
+    sys.exit(_main())
