@@ -105,7 +105,7 @@ Write-Host "  ${Purple}Python packages${Reset}       Background libraries used b
 Write-Host "                        and synthesize your existing files (PDFs, docs, slides)."
 Write-Host ""
 Write-Host "  ${Purple}Vault skills${Reset}          Slash commands that teach Claude how to use your vault:"
-Write-Host "                        /vault-setup  /daily  /tldr  /file-intel"
+Write-Host "                        /vault-setup  /daily  /tldr  /file-intel  /jobs"
 Write-Host ""
 Write-Host "  ${Purple}Obsidian Skills${Reset}       Official skills by Kepano (Obsidian CEO) - lets Claude"
 Write-Host "  ${Dim}(optional)${Reset}            navigate your vault using the Obsidian CLI."
@@ -260,7 +260,7 @@ if ($hasObsidianFolder -or $isNonEmptyDir) {
     Write-Host ""
     Write-Host "  ${Green}+${Reset} Add missing folders (inbox/, daily/, projects/, etc.)"
     Write-Host "  ${Green}+${Reset} Optionally install the full guide into guide\ (you'll be asked)"
-    Write-Host "  ${Green}+${Reset} Install 6 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health"
+    Write-Host "  ${Green}+${Reset} Install 7 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health /jobs"
     Write-Host "  ${Green}+${Reset} Copy helper scripts to scripts/"
     Write-Host "  ${Green}+${Reset} Install skills globally to $env:USERPROFILE\.claude\skills\"
     if ($hasExistingClaude) {
@@ -304,6 +304,7 @@ New-Item -ItemType Directory -Force -Path "$vaultPath\.claude\skills\tldr" | Out
 New-Item -ItemType Directory -Force -Path "$vaultPath\.claude\skills\file-intel" | Out-Null
 New-Item -ItemType Directory -Force -Path "$vaultPath\.claude\skills\weekly" | Out-Null
 New-Item -ItemType Directory -Force -Path "$vaultPath\.claude\skills\vault-health" | Out-Null
+New-Item -ItemType Directory -Force -Path "$vaultPath\.claude\skills\jobs" | Out-Null
 
 # Copy core files (with existence checks to handle partial repo downloads)
 $copyErrors = 0
@@ -314,7 +315,8 @@ foreach ($src in @(
     @("$scriptDir\skills\tldr\SKILL.md", "$vaultPath\.claude\skills\tldr\SKILL.md"),
     @("$scriptDir\skills\file-intel\SKILL.md", "$vaultPath\.claude\skills\file-intel\SKILL.md"),
     @("$scriptDir\skills\weekly\SKILL.md", "$vaultPath\.claude\skills\weekly\SKILL.md"),
-    @("$scriptDir\skills\vault-health\SKILL.md", "$vaultPath\.claude\skills\vault-health\SKILL.md")
+    @("$scriptDir\skills\vault-health\SKILL.md", "$vaultPath\.claude\skills\vault-health\SKILL.md"),
+    @("$scriptDir\skills\jobs\SKILL.md", "$vaultPath\.claude\skills\jobs\SKILL.md")
 )) {
     if (Test-Path $src[0]) {
         Copy-Item $src[0] $src[1] -Force
@@ -335,6 +337,27 @@ if (Test-Path "$scriptDir\memory.md") {
 foreach ($script in @("process_docs_to_obsidian.py", "process_files_with_gemini.py", "vault_health.py")) {
     if (Test-Path "$scriptDir\scripts\$script") {
         Copy-Item "$scriptDir\scripts\$script" "$vaultPath\scripts\" -Force
+    }
+}
+
+# Copy scripts/jobs/ (config-driven job-pipeline scaffolder)
+New-Item -ItemType Directory -Force -Path "$vaultPath\scripts\jobs\templates" | Out-Null
+foreach ($jobsFile in @("jobslib.py", "scaffold.py")) {
+    if (Test-Path "$scriptDir\scripts\jobs\$jobsFile") {
+        Copy-Item "$scriptDir\scripts\jobs\$jobsFile" "$vaultPath\scripts\jobs\" -Force
+    }
+}
+if (Test-Path "$scriptDir\scripts\jobs\templates\kit-hub.md") {
+    Copy-Item "$scriptDir\scripts\jobs\templates\kit-hub.md" "$vaultPath\scripts\jobs\templates\" -Force
+}
+
+# applications/ scaffold (Facts Ledger, config template, trackers) -- never
+# overwrite on re-run, since it may already hold the user's real kits
+if (-not (Test-Path "$vaultPath\applications")) {
+    if (Test-Path "$scriptDir\vault-template\applications") {
+        Copy-Item "$scriptDir\vault-template\applications" "$vaultPath\applications" -Recurse -Force
+    } else {
+        Write-Host "  ${Orange}WARNING${Reset}  Missing: $scriptDir\vault-template\applications"
     }
 }
 
@@ -378,7 +401,7 @@ if ($guideAnswer -match '^[Yy]') {
 
 # Install skills globally (so they work in ANY folder, not just the vault)
 $globalSkillsPath = "$env:USERPROFILE\.claude\skills"
-foreach ($skill in @("vault-setup", "daily", "tldr", "file-intel", "weekly", "vault-health")) {
+foreach ($skill in @("vault-setup", "daily", "tldr", "file-intel", "weekly", "vault-health", "jobs")) {
     New-Item -ItemType Directory -Force -Path "$globalSkillsPath\$skill" | Out-Null
     if (Test-Path "$scriptDir\skills\$skill\SKILL.md") {
         Copy-Item "$scriptDir\skills\$skill\SKILL.md" "$globalSkillsPath\$skill\SKILL.md" -Force
@@ -575,7 +598,7 @@ if ($isExistingVault) {
     Write-Host "  ${Green}Your vault is upgraded.${Reset}"
     Write-Host ""
     Write-Host "  ${White}What you just got:${Reset}"
-    Write-Host "  - 6 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health"
+    Write-Host "  - 7 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health /jobs"
     if ($hasExistingClaude) {
         Write-Host "  - New CLAUDE.md template (your original backed up as $backupName)"
     } else {
@@ -587,7 +610,7 @@ if ($isExistingVault) {
     Write-Host "  ${Green}Your second brain is ready.${Reset}"
     Write-Host ""
     Write-Host "  ${White}What you just got:${Reset}"
-    Write-Host "  - 6 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health"
+    Write-Host "  - 7 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health /jobs"
     Write-Host "  - CLAUDE.md template (personalize it with /vault-setup)"
     Write-Host "  - Vault folder structure for organizing your notes"
     Write-Host "  - File processing scripts (optional, needs Gemini API key)"

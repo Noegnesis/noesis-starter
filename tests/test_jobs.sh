@@ -17,6 +17,14 @@ assert_file_exists "$VT/Applications.md" "markdown fallback tracker ships"
 tmpl="$(cat "$VT/_jobs/config.md")"
 assert_contains "$tmpl" "track-1" "config template uses placeholder lanes"
 
+assert_file_exists "$ROOT/skills/jobs/SKILL.md" "jobs skill ships"
+js="$(cat "$ROOT/skills/jobs/SKILL.md")"
+assert_contains "$js" "scaffold.py" "skill drives the scaffolder"
+assert_contains "$js" "config" "skill reads the per-user config"
+assert_contains "$js" "dry-run" "skill previews before writing"
+claude="$(cat "$ROOT/CLAUDE.md")"
+assert_contains "$claude" "/jobs" "CLAUDE.md lists the /jobs command"
+
 if [ -z "$PY" ]; then
   pass "skipped jobslib behavior (no python on PATH)"
 else

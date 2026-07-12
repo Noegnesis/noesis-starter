@@ -96,7 +96,7 @@ echo -e "  ${PURPLE}Python packages${RESET}       Background libraries used by G
 echo -e "                        and synthesize your existing files (PDFs, docs, slides)."
 echo ""
 echo -e "  ${PURPLE}Vault skills${RESET}          Slash commands that teach Claude how to use your vault:"
-echo -e "                        /vault-setup  /daily  /tldr  /file-intel"
+echo -e "                        /vault-setup  /daily  /tldr  /file-intel  /jobs"
 echo ""
 echo -e "  ${PURPLE}Obsidian Skills${RESET}       Official skills by Kepano (Obsidian CEO) — lets Claude"
 echo -e "  ${DIM}(optional)${RESET}            navigate your vault using the Obsidian CLI."
@@ -225,7 +225,7 @@ if [ "$HAS_OBSIDIAN_FOLDER" = true ] || [ "$IS_NON_EMPTY" = true ]; then
   echo ""
   echo -e "  ${GREEN}+${RESET} Add missing folders (inbox/, daily/, projects/, etc.)"
   echo -e "  ${GREEN}+${RESET} Optionally install the full guide into guide/ (you'll be asked)"
-  echo -e "  ${GREEN}+${RESET} Install 6 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health"
+  echo -e "  ${GREEN}+${RESET} Install 7 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health /jobs"
   echo -e "  ${GREEN}+${RESET} Copy helper scripts to scripts/"
   echo -e "  ${GREEN}+${RESET} Install skills globally to ~/.claude/skills/"
   if [ "$HAS_EXISTING_CLAUDE" = true ]; then
@@ -255,7 +255,7 @@ if [ "$HAS_OBSIDIAN_FOLDER" = true ] || [ "$IS_NON_EMPTY" = true ]; then
   fi
 fi
 
-mkdir -p "$VAULT_PATH"/{inbox,daily,projects,research,archive,scripts,.claude/skills/vault-setup,.claude/skills/daily,.claude/skills/tldr,.claude/skills/file-intel,.claude/skills/weekly,.claude/skills/vault-health}
+mkdir -p "$VAULT_PATH"/{inbox,daily,projects,research,archive,scripts,.claude/skills/vault-setup,.claude/skills/daily,.claude/skills/tldr,.claude/skills/file-intel,.claude/skills/weekly,.claude/skills/vault-health,.claude/skills/jobs}
 
 # Copy core files using safe_cp (won't crash if source is missing)
 # Only call backup_claude_md if the inline backup above did NOT already run
@@ -274,9 +274,21 @@ safe_cp "$SCRIPT_DIR/skills/tldr/SKILL.md"         "$VAULT_PATH/.claude/skills/t
 safe_cp "$SCRIPT_DIR/skills/file-intel/SKILL.md"   "$VAULT_PATH/.claude/skills/file-intel/SKILL.md"
 safe_cp "$SCRIPT_DIR/skills/weekly/SKILL.md"       "$VAULT_PATH/.claude/skills/weekly/SKILL.md"
 safe_cp "$SCRIPT_DIR/skills/vault-health/SKILL.md" "$VAULT_PATH/.claude/skills/vault-health/SKILL.md"
+safe_cp "$SCRIPT_DIR/skills/jobs/SKILL.md"         "$VAULT_PATH/.claude/skills/jobs/SKILL.md"
 safe_cp "$SCRIPT_DIR/scripts/process_docs_to_obsidian.py" "$VAULT_PATH/scripts/process_docs_to_obsidian.py"
 safe_cp "$SCRIPT_DIR/scripts/process_files_with_gemini.py" "$VAULT_PATH/scripts/process_files_with_gemini.py"
 safe_cp "$SCRIPT_DIR/scripts/vault_health.py" "$VAULT_PATH/scripts/vault_health.py"
+mkdir -p "$VAULT_PATH/scripts/jobs/templates"
+safe_cp "$SCRIPT_DIR/scripts/jobs/jobslib.py"           "$VAULT_PATH/scripts/jobs/jobslib.py"
+safe_cp "$SCRIPT_DIR/scripts/jobs/scaffold.py"          "$VAULT_PATH/scripts/jobs/scaffold.py"
+safe_cp "$SCRIPT_DIR/scripts/jobs/templates/kit-hub.md" "$VAULT_PATH/scripts/jobs/templates/kit-hub.md"
+
+# applications/ scaffold (Facts Ledger, config template, trackers) — never
+# overwrite on re-run, since it may already hold the user's real kits
+if [ ! -d "$VAULT_PATH/applications" ]; then
+  cp -R "$SCRIPT_DIR/vault-template/applications" "$VAULT_PATH/applications" 2>/dev/null \
+    || echo -e "  ${ORANGE}⚠${RESET}  Missing: $SCRIPT_DIR/vault-template/applications"
+fi
 
 # ─── Guide in the vault (optional, default yes) ──────────────────────────────
 echo ""
@@ -312,13 +324,15 @@ fi
 # Also install skills globally so they work in ANY folder, not just the vault
 mkdir -p "$HOME/.claude/skills/vault-setup" "$HOME/.claude/skills/daily" \
          "$HOME/.claude/skills/tldr" "$HOME/.claude/skills/file-intel" \
-         "$HOME/.claude/skills/weekly" "$HOME/.claude/skills/vault-health"
+         "$HOME/.claude/skills/weekly" "$HOME/.claude/skills/vault-health" \
+         "$HOME/.claude/skills/jobs"
 safe_cp "$SCRIPT_DIR/skills/vault-setup/SKILL.md"  "$HOME/.claude/skills/vault-setup/SKILL.md"
 safe_cp "$SCRIPT_DIR/skills/daily/SKILL.md"        "$HOME/.claude/skills/daily/SKILL.md"
 safe_cp "$SCRIPT_DIR/skills/tldr/SKILL.md"         "$HOME/.claude/skills/tldr/SKILL.md"
 safe_cp "$SCRIPT_DIR/skills/file-intel/SKILL.md"   "$HOME/.claude/skills/file-intel/SKILL.md"
 safe_cp "$SCRIPT_DIR/skills/weekly/SKILL.md"       "$HOME/.claude/skills/weekly/SKILL.md"
 safe_cp "$SCRIPT_DIR/skills/vault-health/SKILL.md" "$HOME/.claude/skills/vault-health/SKILL.md"
+safe_cp "$SCRIPT_DIR/skills/jobs/SKILL.md"         "$HOME/.claude/skills/jobs/SKILL.md"
 
 if [ "$IS_EXISTING_VAULT" = true ]; then
   echo -e "  ${GREEN}✓${RESET} Skills + scripts added to existing vault at $VAULT_PATH"
@@ -478,7 +492,7 @@ if [ "$IS_EXISTING_VAULT" = true ]; then
   echo -e "  ${GREEN}✅ Your vault is upgraded.${RESET}"
   echo ""
   echo -e "  ${WHITE}What you just got:${RESET}"
-  echo -e "  - 6 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health"
+  echo -e "  - 7 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health /jobs"
   if [ "$HAS_EXISTING_CLAUDE" = true ]; then
     echo -e "  - New CLAUDE.md template (your original backed up as $BACKUP_NAME)"
   else
@@ -490,7 +504,7 @@ else
   echo -e "  ${GREEN}✅ Your second brain is ready.${RESET}"
   echo ""
   echo -e "  ${WHITE}What you just got:${RESET}"
-  echo -e "  - 6 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health"
+  echo -e "  - 7 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health /jobs"
   echo -e "  - CLAUDE.md template (personalize it with /vault-setup)"
   echo -e "  - Vault folder structure for organizing your notes"
   echo -e "  - File processing scripts (optional, needs Gemini API key)"

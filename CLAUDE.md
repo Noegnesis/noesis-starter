@@ -11,6 +11,7 @@ daily/      ← Daily notes (YYYY-MM-DD.md)
 projects/   ← Active projects and briefs
 research/   ← Notes, synthesis, saved ideas
 archive/    ← Completed work. Never delete, just archive.
+applications/ ← Job-search kits, Facts Ledger, and the Applications tracker (optional module)
 guide/      ← The how-to guide (optional install). Start at MOC - Guide.md.
 ```
 
@@ -42,3 +43,4 @@ When writing anything:
 - /tldr          — Save a summary of this session to the vault
 - /file-intel    — Process any folder of files through Gemini, get Obsidian-ready summaries
 - /vault-health  — Audit vault content: broken links, orphans, stale MOCs
+- /jobs          — Ingest a posting, score fit, tailor a kit, and track it
