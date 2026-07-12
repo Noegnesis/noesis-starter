@@ -47,6 +47,15 @@ Options, roughly in order of "just works":
 > **Decide before you create the vault**
 > Where the vault lives ([02 — Obsidian Vault Setup](02-obsidian-vault-setup.md) step 1) determines your sync options. Moving a vault later breaks absolute paths in scripts and configs. Choose the location with sync in mind on day one.
 
+### Vault-in-Git: the hygiene that makes it work
+
+If you pick Git (a **private** repo + a git plugin committing on a timer, say every 15 minutes), a plain-text vault becomes a first-class repo — real history, real diffs, no drive-letter or mount weirdness because every machine has a normal local clone. Four pieces of hygiene make it safe:
+
+1. **`.gitattributes`** with `* text=auto` — kills cross-OS line-ending churn before it starts (a Windows and a Mac editing the same vault will otherwise rewrite each other's files forever).
+2. **`.gitignore`** the non-content: `.env`, your `sensitive/` folder, `.obsidian/workspace*` (per-device UI state that conflicts constantly), plugin caches, and anything large and regenerable.
+3. **A secret scanner as a pre-commit hook** (e.g. gitleaks) — one pasted API key in a note is otherwise in your history permanently.
+4. **Sync ≠ backup, still.** Git faithfully propagates a deletion to every clone. Keep the independent backup from the section below.
+
 ---
 
 ## Syncing the agent setup: the canonical-device pattern

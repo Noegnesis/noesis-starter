@@ -125,6 +125,13 @@ The agent has a finite context window. Two habits keep it sharp:
 > **Routing rules pay for themselves**
 > A rule like *"when I mention a person, check the relationships note first — never grep the whole vault for a name"* turns a 40-file scan into a 1-file read, and a vague answer into a precise one.
 
+Context discipline is also **token discipline** — on a metered plan the two are the same thing. Field-tested rules of thumb:
+
+- **Load on demand, not by default.** A global `CLAUDE.md` that says *"my vault conventions live at `<path>` — read them when a task touches the vault"* costs a sentence per session; inlining the whole conventions file costs thousands of tokens per session whether the task needs them or not. Inline only the always-relevant essentials; point at the rest.
+- **Prune memory on a rhythm.** The memory index from Step 4 is loaded every session — archive completed entries out of it instead of letting the preamble grow without bound.
+- **Watch anything that runs unattended.** A scheduled briefing or an always-on health probe bills like a real session, every time it fires. Before scheduling (see [05 — Skills & Automation](05-skills-and-automation.md)), know what one run costs — and point recurring automation at the cheapest model that does the job.
+- **Keep interactive and automated paths separable.** Headless invocations (`claude -p`, SDK-driven agents) may be metered or plan-restricted differently from your interactive sessions over time. If your automation can swap to an API key without rewiring, a billing-policy change is an annoyance instead of an outage.
+
 ---
 
 ## What "done with this doc" looks like
