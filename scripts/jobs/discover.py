@@ -244,14 +244,8 @@ def guess_lane(role, keyword_map):
 
 def is_excluded(role, patterns):
     title = role.get("role", "").lower()
-    for p in patterns or []:
-        p_str = str(p).lower()
-        # Skip multi-word patterns (those containing spaces)
-        if ' ' in p_str:
-            continue
-        if re.search(r"\b" + re.escape(p_str) + r"\b", title):
-            return True
-    return False
+    return any(re.search(r"\b" + re.escape(str(p).lower()) + r"\b", title)
+               for p in patterns or [])
 
 
 ATS_SOURCES = ("greenhouse", "lever", "ashby")

@@ -71,7 +71,7 @@ print(d.guess_lane({'role':'Chef','jd_excerpt':''},kw))
 print(d.is_excluded({'role':'Staff Accountant'},['staff accountant']))")"
   assert_contains "$logic" "('greenhouse', 'acme')" "board entries parse to (ats, slug)"
   assert_contains "$logic" "track-a" "lane keywords from config drive the lane guess"
-  assert_contains "$logic" "False" "excluded-title check is case-insensitive"
+  assert_contains "$logic" "True" "excluded titles match case-insensitively (multi-word)"
 
   # dedupe: stable key already seen -> dropped
   dd="$("$PY" -c "
