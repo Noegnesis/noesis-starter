@@ -260,7 +260,7 @@ if ($hasObsidianFolder -or $isNonEmptyDir) {
     Write-Host ""
     Write-Host "  ${Green}+${Reset} Add missing folders (inbox/, daily/, projects/, etc.)"
     Write-Host "  ${Green}+${Reset} Optionally install the full guide into guide\ (you'll be asked)"
-    Write-Host "  ${Green}+${Reset} Install 4 slash commands: /vault-setup /daily /tldr /file-intel"
+    Write-Host "  ${Green}+${Reset} Install 6 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health"
     Write-Host "  ${Green}+${Reset} Copy helper scripts to scripts/"
     Write-Host "  ${Green}+${Reset} Install skills globally to $env:USERPROFILE\.claude\skills\"
     if ($hasExistingClaude) {
@@ -302,6 +302,8 @@ New-Item -ItemType Directory -Force -Path "$vaultPath\.claude\skills\vault-setup
 New-Item -ItemType Directory -Force -Path "$vaultPath\.claude\skills\daily" | Out-Null
 New-Item -ItemType Directory -Force -Path "$vaultPath\.claude\skills\tldr" | Out-Null
 New-Item -ItemType Directory -Force -Path "$vaultPath\.claude\skills\file-intel" | Out-Null
+New-Item -ItemType Directory -Force -Path "$vaultPath\.claude\skills\weekly" | Out-Null
+New-Item -ItemType Directory -Force -Path "$vaultPath\.claude\skills\vault-health" | Out-Null
 
 # Copy core files (with existence checks to handle partial repo downloads)
 $copyErrors = 0
@@ -310,7 +312,9 @@ foreach ($src in @(
     @("$scriptDir\skills\vault-setup\SKILL.md", "$vaultPath\.claude\skills\vault-setup\SKILL.md"),
     @("$scriptDir\skills\daily\SKILL.md", "$vaultPath\.claude\skills\daily\SKILL.md"),
     @("$scriptDir\skills\tldr\SKILL.md", "$vaultPath\.claude\skills\tldr\SKILL.md"),
-    @("$scriptDir\skills\file-intel\SKILL.md", "$vaultPath\.claude\skills\file-intel\SKILL.md")
+    @("$scriptDir\skills\file-intel\SKILL.md", "$vaultPath\.claude\skills\file-intel\SKILL.md"),
+    @("$scriptDir\skills\weekly\SKILL.md", "$vaultPath\.claude\skills\weekly\SKILL.md"),
+    @("$scriptDir\skills\vault-health\SKILL.md", "$vaultPath\.claude\skills\vault-health\SKILL.md")
 )) {
     if (Test-Path $src[0]) {
         Copy-Item $src[0] $src[1] -Force
@@ -328,7 +332,7 @@ if (Test-Path "$scriptDir\memory.md") {
 }
 
 # Copy scripts (optional -- file processing won't work without them but vault still works)
-foreach ($script in @("process_docs_to_obsidian.py", "process_files_with_gemini.py")) {
+foreach ($script in @("process_docs_to_obsidian.py", "process_files_with_gemini.py", "vault_health.py")) {
     if (Test-Path "$scriptDir\scripts\$script") {
         Copy-Item "$scriptDir\scripts\$script" "$vaultPath\scripts\" -Force
     }
@@ -374,7 +378,7 @@ if ($guideAnswer -match '^[Yy]') {
 
 # Install skills globally (so they work in ANY folder, not just the vault)
 $globalSkillsPath = "$env:USERPROFILE\.claude\skills"
-foreach ($skill in @("vault-setup", "daily", "tldr", "file-intel")) {
+foreach ($skill in @("vault-setup", "daily", "tldr", "file-intel", "weekly", "vault-health")) {
     New-Item -ItemType Directory -Force -Path "$globalSkillsPath\$skill" | Out-Null
     if (Test-Path "$scriptDir\skills\$skill\SKILL.md") {
         Copy-Item "$scriptDir\skills\$skill\SKILL.md" "$globalSkillsPath\$skill\SKILL.md" -Force
@@ -571,7 +575,7 @@ if ($isExistingVault) {
     Write-Host "  ${Green}Your vault is upgraded.${Reset}"
     Write-Host ""
     Write-Host "  ${White}What you just got:${Reset}"
-    Write-Host "  - 4 slash commands: /vault-setup /daily /tldr /file-intel"
+    Write-Host "  - 6 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health"
     if ($hasExistingClaude) {
         Write-Host "  - New CLAUDE.md template (your original backed up as $backupName)"
     } else {
@@ -583,7 +587,7 @@ if ($isExistingVault) {
     Write-Host "  ${Green}Your second brain is ready.${Reset}"
     Write-Host ""
     Write-Host "  ${White}What you just got:${Reset}"
-    Write-Host "  - 4 slash commands: /vault-setup /daily /tldr /file-intel"
+    Write-Host "  - 6 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health"
     Write-Host "  - CLAUDE.md template (personalize it with /vault-setup)"
     Write-Host "  - Vault folder structure for organizing your notes"
     Write-Host "  - File processing scripts (optional, needs Gemini API key)"

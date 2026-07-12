@@ -53,12 +53,14 @@ Start with a small, high-leverage set. These map directly onto the four jobs fro
 
 ## Slash commands
 
-A skill exposed as `/name` is a **slash command** — a named entry point you type. The starter set ships four commands:
+A skill exposed as `/name` is a **slash command** — a named entry point you type. The starter set ships six commands:
 
 - `/vault-setup` — interview + personalize your vault and CLAUDE.md
-- `/daily` — morning briefing: daily note + top 3 priorities
+- `/daily` — morning briefing: daily note + top 3 priorities + the Linked Today sweep
+- `/weekly` — end-of-week review: wins, lessons, carry-overs, next week
 - `/tldr` — save a structured session summary to the vault
 - `/file-intel` — process a folder of files into summaries
+- `/vault-health` — audit vault content: broken links, orphans, stale MOCs
 
 You don't memorize syntax; you type the verb and the agent runs the workflow.
 

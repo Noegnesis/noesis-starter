@@ -35,7 +35,7 @@ without risking your notes, wikilinks, or Claude Code setup. See
 
 ## What gets installed
 
-Obsidian, Claude Code, Python deps (in an isolated venv), the core skills (`/vault-setup`, `/daily`, `/tldr`, `/file-intel`) both in this vault and globally, and (optionally) the full guide inside your vault as `guide/`.
+Obsidian, Claude Code, Python deps (in an isolated venv), the core skills (`/vault-setup`, `/daily`, `/tldr`, `/file-intel`, `/weekly`, `/vault-health`) both in this vault and globally, and (optionally) the full guide inside your vault as `guide/`.
 
 ## Going deeper
 
@@ -88,14 +88,16 @@ noesis-starter/
 
 ## Slash commands
 
-Four commands come pre-installed:
+Six commands come pre-installed:
 
 | Command | What it does |
 |---------|-------------|
 | `/vault-setup` | Interviews you (role, projects, goals) and generates your personalized vault structure + CLAUDE.md + custom slash commands |
-| `/daily` | Starts your day — reads today's note or creates one, surfaces your top priorities, asks what you're working on |
+| `/daily` | Starts your day — reads today's note or creates one, surfaces your top priorities, reconciles the `## Linked Today` hub, asks what you're working on |
+| `/weekly` | End-of-week review — wins, lessons, carry-overs, and next week's top 3, built from the week's daily notes |
 | `/tldr` | At the end of any session, saves a structured summary to the right folder in your vault automatically |
 | `/file-intel` | Point it at any folder — processes every file and generates Obsidian-ready summaries into your inbox |
+| `/vault-health` | Audits your vault's content — broken links, orphaned notes, stale MOCs — read-only, with a safe auto-fix + undo |
 
 Skills are installed both locally (in your vault) and globally (`~/.claude/skills/`), so slash commands work from any folder.
 

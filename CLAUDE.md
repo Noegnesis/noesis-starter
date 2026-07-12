@@ -36,7 +36,9 @@ When writing anything:
 - Update this file whenever your conventions change
 
 ## Available Slash Commands
-- /vault-setup  — Personalize this vault for your role
-- /daily        — Start the day with vault context
-- /tldr         — Save a summary of this session to the vault
-- /file-intel   — Process any folder of files through Gemini, get Obsidian-ready summaries
+- /vault-setup   — Personalize this vault for your role
+- /daily         — Start the day with vault context
+- /weekly        — End-of-week review from the week's daily notes
+- /tldr          — Save a summary of this session to the vault
+- /file-intel    — Process any folder of files through Gemini, get Obsidian-ready summaries
+- /vault-health  — Audit vault content: broken links, orphans, stale MOCs
