@@ -11,6 +11,15 @@ frag="$(cat "$ROOT/scripts/jobs/templates/resume-fragment.md")"
 assert_contains "$frag" "{lane}" "fragment template is tokenized by lane"
 assert_contains "$frag" "{anchor_bullets}" "fragment template carries anchor slots"
 
+assert_file_exists "$ROOT/skills/jobs-setup/SKILL.md" "jobs-setup skill ships"
+ss="$(cat "$ROOT/skills/jobs-setup/SKILL.md")"
+assert_contains "$ss" "jobslib.py validate" "skill validates the config it writes"
+assert_contains "$ss" "_fragments" "skill seeds resume fragments"
+assert_contains "$ss" "Facts Ledger" "skill seeds the facts ledger"
+assert_contains "$ss" ".env" "skill routes secrets to .env"
+assert_contains "$ss" "gitignored" "skill notes .env is gitignored"
+assert_contains "$ss" "build it" "skill gates the build on confirmation"
+
 if [ -z "$PY" ]; then
   pass "skipped jobs-setup behavior (no python on PATH)"
 else
