@@ -131,7 +131,7 @@ At the section level, use callouts so authorship is visible inline:
 A second brain only surfaces deadlines if you give it a daily heartbeat. The stack runs a **three-layer periodic model** (concept introduced in [01 — Foundations & Philosophy](01-foundations-and-philosophy.md), automated in [05 — Skills & Automation](05-skills-and-automation.md)):
 
 - **Operational daily note** (`daily/YYYY-MM-DD.md`) — AI-assisted morning briefing: your top 3 priorities and notes (calendar/tasks appear only if you've wired an optional connector — see [docs/advanced/mcp-wiring.md](advanced/mcp-wiring.md)).
-- **Weekly review** — wins, lessons, next week's plan (not in the starter set — build your own skill following the pattern in [05 — Skills & Automation](05-skills-and-automation.md)).
+- **Weekly review** — wins, lessons, carry-overs, next week's plan; `/weekly` builds it from the week's daily notes.
 - **Journal** (`identity/journal/...`) — your raw voice, separate, AI-untouched.
 
 > [!TIP]
