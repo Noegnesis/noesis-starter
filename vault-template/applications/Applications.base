@@ -1,0 +1,16 @@
+filters:
+  and:
+    - type == "application"
+views:
+  - type: table
+    name: Pipeline
+    order:
+      - file.name
+      - status
+      - lane
+      - location
+      - apply_target
+      - deadline
+    sort:
+      - property: apply_target
+        direction: ASC

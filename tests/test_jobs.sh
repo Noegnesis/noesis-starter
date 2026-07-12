@@ -7,6 +7,16 @@ PY="$(command -v python3 || command -v python || true)"
 
 assert_file_exists "$ROOT/scripts/jobs/jobslib.py" "jobslib ships"
 
+VT="$ROOT/vault-template/applications"
+assert_file_exists "$VT/_jobs/config.md" "config template ships"
+assert_file_exists "$VT/_jobs/.env.example" "env example ships"
+assert_file_exists "$VT/Facts Ledger.md" "facts ledger template ships"
+assert_file_exists "$VT/Cover Letter - Base.md" "cover letter base ships"
+assert_file_exists "$VT/Applications.base" "bases tracker ships"
+assert_file_exists "$VT/Applications.md" "markdown fallback tracker ships"
+tmpl="$(cat "$VT/_jobs/config.md")"
+assert_contains "$tmpl" "track-1" "config template uses placeholder lanes"
+
 if [ -z "$PY" ]; then
   pass "skipped jobslib behavior (no python on PATH)"
 else
@@ -27,10 +37,16 @@ EOF
   cfg="$TMP/applications/_jobs/config.md"
   # Convert paths for Windows Python (use cygpath -m for mixed path format)
   JOBS_PATH="$ROOT/scripts/jobs"
+  VT_PATH="$ROOT/vault-template/applications"
   if command -v cygpath >/dev/null 2>&1; then
     JOBS_PATH="$(cygpath -m "$JOBS_PATH")" || JOBS_PATH="$ROOT/scripts/jobs"
     cfg="$(cygpath -m "$cfg")" || cfg="$TMP/applications/_jobs/config.md"
+    VT_PATH="$(cygpath -m "$VT_PATH")" || VT_PATH="$ROOT/vault-template/applications"
   fi
+  # shipped config template validates clean
+  tmplcfg="$("$PY" -c "import sys; sys.path.insert(0,'$JOBS_PATH'); import jobslib as j; c=j.load_config('$VT_PATH/_jobs/config.md'); print(j.validate_config(c))")"
+  assert_contains "$tmplcfg" "[]" "shipped config template validates clean"
+
   # valid config: name + lane_keys + standalone applications_dir
   out="$("$PY" -c "import sys; sys.path.insert(0,'$JOBS_PATH'); import jobslib as j; c=j.load_config('$cfg'); print(c['profile']['name']); print(','.join(j.lane_keys(c))); print(j.validate_config(c)); print(j.resolve_paths(c,'$cfg')['applications_dir'])")"
   assert_contains "$out" "Test User" "load_config reads profile.name"
