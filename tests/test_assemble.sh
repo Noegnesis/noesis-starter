@@ -37,7 +37,7 @@ else
   assert_eq "$vrc" "0" "shipped modules validate clean"
   assert_contains "$vout" "modules OK" "validate prints modules OK"
   assert_contains "$vout" "inbox" "validate names the module ids"
-  assert_contains "$vout" "8 module(s)" "all eight shipped docs validate"
+  assert_contains "$vout" "9 module(s)" "all nine shipped docs validate"
 
   # a broken doc produces named problems and exit 1
   mkdir -p "$TMP/badmods"
@@ -346,5 +346,22 @@ print('\n'.join(sorted(out)))" | tr -d '\r')"
   pr_region="$(sed -n '/noesis:modules:start/,/noesis:modules:end/p' "$PR/CLAUDE.md" | tr -d '\r')"
   assert_eq "$pr_region" "$(tr -d '\r' < "$ROOT/tests/fixtures/engine/persona-researcher.claude-region.md")" "researcher golden region matches"
   assert_contains "$pr_region" "### Research & Notes" "depends_on pulls the core research module into the region"
+
+  # --- persona golden: asset-curator (portfolio/assets over projects) ---
+  PA="$TMP/pa"; mkdir -p "$PA"
+  "$PY" "$ASM" --select asset-portfolio \
+     --answers "$ROOT/tests/fixtures/engine/persona-asset-curator.answers.yaml" \
+     --dest "$PA" --execute >/dev/null
+  pa_tree="$("$PY" -c "
+from pathlib import Path
+root=Path('$TMP_PY/pa'); out=[]
+for p in sorted(root.rglob('*')):
+    rel=p.relative_to(root).as_posix()
+    if rel.startswith('CLAUDE.md.bak'): continue
+    out.append(rel+'/' if p.is_dir() else rel)
+print('\n'.join(sorted(out)))" | tr -d '\r')"
+  assert_eq "$pa_tree" "$(tr -d '\r' < "$ROOT/tests/fixtures/engine/persona-asset-curator.tree.txt")" "asset-curator golden tree matches"
+  pa_region="$(sed -n '/noesis:modules:start/,/noesis:modules:end/p' "$PA/CLAUDE.md" | tr -d '\r')"
+  assert_eq "$pa_region" "$(tr -d '\r' < "$ROOT/tests/fixtures/engine/persona-asset-curator.claude-region.md")" "asset-curator golden region matches"
 fi
 finish

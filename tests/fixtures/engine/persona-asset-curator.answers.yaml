@@ -1,0 +1,3 @@
+# Generic asset-curator persona — projects core + the portfolio/assets layer.
+asset-portfolio:
+  asset_kinds: images, PDFs, and video

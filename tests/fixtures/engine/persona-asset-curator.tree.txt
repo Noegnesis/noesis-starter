@@ -1,0 +1,5 @@
+CLAUDE.md
+assets/
+portfolio/
+portfolio/Portfolio.md
+projects/
