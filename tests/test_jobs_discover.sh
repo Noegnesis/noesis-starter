@@ -103,5 +103,22 @@ print(hub); print(hub.read_text(encoding='utf-8'))")"
   assert_contains "$st" "gh:acme:7" "stub carries the stable key"
   assert_contains "$st" "attach one with --jd-file" "stub fills the jd_line placeholder"
   assert_contains "$st" "study widgets" "stub carries the jd excerpt"
+
+  # --- annotate.py: score upsert on a real hub, body preserved, idempotent ---
+  AN="$ROOT/scripts/jobs/annotate.py"
+  assert_file_exists "$AN" "annotate ships"
+  "$PY" "$ROOT/scripts/jobs/scaffold.py" --config "$cfg" --org "Beta LLC" --role "Gizmo Engineer" --lane track-b --execute >/dev/null
+  HUB="$TMP/applications/Beta LLC Gizmo Engineer/Beta LLC Gizmo Engineer.md"
+  "$PY" "$AN" --config "$cfg" --hub "$HUB" --tier A --fit-score 87 --why "strong track-a evidence" >/dev/null
+  hub1="$(cat "$HUB")"
+  assert_contains "$hub1" "tier: A" "annotate writes the tier"
+  assert_contains "$hub1" "fit_score: 87" "annotate writes the fit score"
+  assert_contains "$hub1" "scored_date:" "annotate stamps the scored date"
+  assert_contains "$hub1" "## Requirements vs. fit" "annotate preserves the body"
+  "$PY" "$AN" --config "$cfg" --hub "$HUB" --tier B >/dev/null
+  assert_eq "$(grep -c '^tier:' "$HUB")" "1" "re-annotating updates in place (no duplicate keys)"
+  assert_contains "$(cat "$HUB")" "tier: B" "re-annotating overwrites the value"
+  badlane_an="$("$PY" "$AN" --config "$cfg" --hub "$HUB" --lane not-a-lane 2>&1 || true)"
+  assert_contains "$badlane_an" "not-a-lane" "annotate rejects lanes missing from config"
 fi
 finish
