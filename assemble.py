@@ -313,6 +313,9 @@ def upsert_region(existing, region):
     if existing is None:
         return region + "\n", "created"
     if MARK_START in existing and MARK_END in existing:
+        if existing.index(MARK_END) < existing.index(MARK_START):
+            raise ModuleError("CLAUDE.md managed-region markers are malformed "
+                              "(end marker precedes start) — fix the file and re-run")
         head = existing.split(MARK_START, 1)[0]
         tail = existing.split(MARK_END, 1)[1]
         return head + region + tail, "replaced"
@@ -328,8 +331,22 @@ def _old_region_titles(existing):
             if line.startswith("### ")]
 
 
+def _contained(dest, relpath):
+    target = (dest / relpath).resolve()
+    dest = dest.resolve()
+    return target == dest or dest in target.parents
+
+
 def _apply_plan(plan, dest):
     dest = Path(dest)
+    escapes = [p for p in (plan["folders"]
+                           + [s["path"] for s in plan["seeds"]]
+                           + [c["dest"] for c in plan["copies"]])
+               if not _contained(dest, p)]
+    if escapes:
+        for p in escapes:
+            print(f"problem: path escapes the vault: {p}")
+        return 1
     dest.mkdir(parents=True, exist_ok=True)
     for folder in plan["folders"]:
         (dest / folder).mkdir(parents=True, exist_ok=True)
@@ -361,7 +378,11 @@ def _apply_plan(plan, dest):
     if existing is not None:
         stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         shutil.copyfile(claude, dest / f"CLAUDE.md.bak.{stamp}")
-    new_text, action = upsert_region(existing, plan["region"])
+    try:
+        new_text, action = upsert_region(existing, plan["region"])
+    except ModuleError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 1
     claude.write_text(new_text, encoding="utf-8")
     print(f"CLAUDE.md region: {action}")
     return 0

@@ -195,5 +195,43 @@ EOF
   V3="$TMP/vault3"; mkdir -p "$V3"
   "$PY" "$ASM" --modules "$TMP/paymods" --select payload --answers "$TMP/answers.yaml" --dest "$V3" --execute >/dev/null
   assert_file_exists "$V3/payloaddir/requirements.txt" "payload copies land at the mapped dest"
+
+  # --- hardening: traversal + malformed markers are refused ---
+  cat > "$TMP/paymods/evil.md" <<'EOF'
+---
+id: evil
+tier: persona
+title: Evil Fixture
+depends_on: []
+suggests: []
+default: false
+---
+
+## Concept
+x
+
+## Applies when
+x
+
+## Questions
+
+## Creates
+- ../escape.md — tries to climb out
+
+## CLAUDE.md snippet
+```
+- x
+```
+EOF
+  V4="$TMP/vault4"; mkdir -p "$V4"
+  ev="$("$PY" "$ASM" --modules "$TMP/paymods" --select evil --answers "$TMP/answers.yaml" --dest "$V4" --execute 2>&1)"; evrc=$?
+  assert_eq "$evrc" "1" "traversal paths are refused"
+  assert_contains "$ev" "escapes the vault" "traversal error is named"
+  assert_eq "$([ -f "$TMP/escape.md" ] && echo yes || echo no)" "no" "nothing written outside the vault"
+  V5="$TMP/vault5"; mkdir -p "$V5"
+  printf '%s\nuser\n%s\nmore\n' '<!-- noesis:modules:end -->' '<!-- noesis:modules:start -->' > "$V5/CLAUDE.md"
+  mm="$("$PY" "$ASM" --select archive --answers "$TMP/answers.yaml" --dest "$V5" --execute 2>&1)"; mmrc=$?
+  assert_eq "$mmrc" "1" "malformed markers are refused"
+  assert_contains "$mm" "malformed" "marker error is named"
 fi
 finish
