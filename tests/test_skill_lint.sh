@@ -9,6 +9,14 @@ assert_contains "$body" "Basic" "offers a basic branch"
 assert_contains "$body" "Power" "offers a power branch"
 assert_contains "$body" "more tokens" "power branch carries a token heads-up"
 
+# Power branch drives the real module engine (Phase 2)
+assert_contains "$body" "assemble.py" "power branch runs the assembler"
+assert_contains "$body" ".noesis/answers.yaml" "power branch writes a vault-local answers file"
+assert_contains "$body" "modules/" "power branch reads the module docs"
+assert_contains "$body" "--execute" "power branch gates the write behind --execute"
+assert_contains "$body" "jobs-setup" "power branch routes job-seekers to /jobs-setup"
+assert_contains "$body" "managed region" "power branch defers folder/context rules to the assembler's region"
+
 # Cross-platform rule, ALL skills: a skill that shells out to macOS `open`
 # must also offer a Windows/Linux alternative (explorer / xdg-open).
 for f in "$ROOT"/skills/*/SKILL.md; do
