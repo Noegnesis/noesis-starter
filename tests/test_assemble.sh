@@ -196,11 +196,16 @@ EOF
   assert_contains "$cl1" "cadence: daily" "region renders the answers"
   assert_eq "$(ls "$V2" | grep -c 'CLAUDE.md.bak')" "1" "existing CLAUDE.md backed up"
 
-  # never-overwrite: user edits a seed; re-run must not clobber it
+  # never-overwrite: user edits a seed; re-run must not clobber it, must not
+  # add a backup (no-op region), and must report the region unchanged
   printf 'MINE\n' > "$V2/people/People.md"
+  baks_before="$(ls "$V2" | grep -c 'CLAUDE.md.bak')"
   rerun="$("$PY" "$ASM" --select daily,people --answers "$TMP/answers.yaml" --dest "$V2" --execute)"
   assert_contains "$rerun" "skip (exists)" "re-run reports skipped seeds"
+  assert_contains "$rerun" "region: unchanged" "no-op re-run reports the region unchanged"
   assert_eq "$(cat "$V2/people/People.md")" "MINE" "re-run never overwrites user files"
+  baks_after="$(ls "$V2" | grep -c 'CLAUDE.md.bak')"
+  assert_eq "$baks_after" "$baks_before" "no-op re-run adds no backup"
   cl2="$(sed -n '/noesis:modules:start/,/noesis:modules:end/p' "$V2/CLAUDE.md")"
   cl1r="$(printf '%s' "$cl1" | sed -n '/noesis:modules:start/,/noesis:modules:end/p')"
   assert_eq "$cl2" "$cl1r" "re-run leaves the managed region byte-identical"

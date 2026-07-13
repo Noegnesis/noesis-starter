@@ -403,14 +403,17 @@ def _apply_plan(plan, dest):
     for title in _old_region_titles(existing):
         if title not in new_titles:
             print(f"orphaned: {title} (folders left in place)")
-    if existing is not None:
-        stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        shutil.copyfile(claude, dest / f"CLAUDE.md.bak.{stamp}")
     try:
         new_text, action = upsert_region(existing, plan["region"])
     except ModuleError as e:
         print(f"error: {e}", file=sys.stderr)
         return 1
+    if existing is not None and new_text == existing:
+        print("CLAUDE.md region: unchanged")
+        return 0
+    if existing is not None:
+        stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        shutil.copyfile(claude, dest / f"CLAUDE.md.bak.{stamp}")
     claude.write_text(new_text, encoding="utf-8")
     print(f"CLAUDE.md region: {action}")
     return 0
