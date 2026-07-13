@@ -289,6 +289,16 @@ safe_cp "$SCRIPT_DIR/scripts/jobs/annotate.py"          "$VAULT_PATH/scripts/job
 mkdir -p "$VAULT_PATH/workflows"
 safe_cp "$SCRIPT_DIR/workflows/company-scan.js"         "$VAULT_PATH/workflows/company-scan.js"
 
+# Engine: assemble.py + module docs (Phase 2 modular vault builder).
+# The /vault-setup Power branch runs `python assemble.py ... --dest .` from
+# inside the vault, so the assembler and every modules/*.md (incl.
+# modules/README.md, the schema contract) must live in the vault.
+safe_cp "$SCRIPT_DIR/assemble.py" "$VAULT_PATH/assemble.py"
+mkdir -p "$VAULT_PATH/modules"
+for m in "$SCRIPT_DIR"/modules/*.md; do
+  [ -f "$m" ] && safe_cp "$m" "$VAULT_PATH/modules/$(basename "$m")"
+done
+
 # applications/ scaffold (Facts Ledger, config template, trackers) — never
 # overwrite on re-run, since it may already hold the user's real kits
 if [ ! -d "$VAULT_PATH/applications" ]; then

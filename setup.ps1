@@ -360,6 +360,17 @@ if (Test-Path "$scriptDir\workflows\company-scan.js") {
     Copy-Item "$scriptDir\workflows\company-scan.js" "$vaultPath\workflows\" -Force
 }
 
+# Engine: assemble.py + module docs (Phase 2 modular vault builder).
+# The /vault-setup Power branch runs assemble.py --dest . from inside the
+# vault, so the assembler and every modules/*.md must be present there.
+if (Test-Path "$scriptDir\assemble.py") {
+    Copy-Item "$scriptDir\assemble.py" "$vaultPath\assemble.py" -Force
+}
+New-Item -ItemType Directory -Force -Path "$vaultPath\modules" | Out-Null
+if (Test-Path "$scriptDir\modules") {
+    Copy-Item "$scriptDir\modules\*.md" "$vaultPath\modules\" -Force
+}
+
 # applications/ scaffold (Facts Ledger, config template, trackers) -- never
 # overwrite on re-run, since it may already hold the user's real kits
 if (-not (Test-Path "$vaultPath\applications")) {
