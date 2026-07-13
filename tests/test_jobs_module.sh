@@ -32,4 +32,19 @@ assert_contains "$guide" "judge loop" "guide teaches the judge loop"
 assert_contains "$guide" "caps the tier at C" "guide carries the seniority hard-fail rule"
 front="$(cat "$ROOT/docs/README.md")"
 assert_contains "$front" "advanced/job-search.md" "front door indexes the job-search guide"
+MF="$ROOT/skills/jobs/module.manifest.md"
+assert_file_exists "$MF" "module manifest ships"
+mf="$(cat "$MF")"
+for f in scripts/jobs/jobslib.py scripts/jobs/scaffold.py scripts/jobs/discover.py \
+         scripts/jobs/annotate.py workflows/company-scan.js skills/jobs/SKILL.md \
+         skills/jobs-setup/SKILL.md docs/advanced/job-search.md; do
+  assert_contains "$mf" "$f" "manifest lists $f"
+done
+missing=""
+for path in $(grep -oE '`[^`]+`' "$MF" | tr -d '\`'); do
+  case "$path" in
+    */*) [ -e "$ROOT/$path" ] || missing="$missing $path";;
+  esac
+done
+if [ -z "$missing" ]; then pass "every manifested path exists"; else fail "manifest lists missing paths:$missing"; fi
 finish
