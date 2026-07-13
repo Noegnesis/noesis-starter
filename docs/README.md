@@ -113,6 +113,7 @@ Don't start from scratch — see **[Augmenting an existing vault](augmenting-an-
 | [advanced/agent-system.md](advanced/agent-system.md) | Multi-agent routing patterns |
 | [advanced/adhd-patterns.md](advanced/adhd-patterns.md) | Deeper executive-function scaffolds |
 | [advanced/data-pipelines.md](advanced/data-pipelines.md) | Wire any service's live data into your daily note — the CLI pipeline recipe |
+| [Job search as a system](advanced/job-search.md) | Lanes, evidence discipline, honest tiering, and the cost-gated company scan |
 
 ---
 
