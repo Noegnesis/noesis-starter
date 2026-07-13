@@ -120,5 +120,10 @@ print(hub); print(hub.read_text(encoding='utf-8'))")"
   assert_contains "$(cat "$HUB")" "tier: B" "re-annotating overwrites the value"
   badlane_an="$("$PY" "$AN" --config "$cfg" --hub "$HUB" --lane not-a-lane 2>&1 || true)"
   assert_contains "$badlane_an" "not-a-lane" "annotate rejects lanes missing from config"
+
+  # --- yaml_safe backslash hardening: backslash input yields parseable frontmatter ---
+  "$PY" "$ROOT/scripts/jobs/scaffold.py" --config "$cfg" --org 'Slash\Co' --role "Test Role" --lane track-a --execute >/dev/null
+  bsh="$(cat "$TMP/applications/SlashCo Test Role/SlashCo Test Role.md")"
+  assert_contains "$bsh" 'org: "Slash/Co"' "yaml_safe converts backslashes (frontmatter stays parseable)"
 fi
 finish

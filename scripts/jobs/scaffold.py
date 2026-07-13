@@ -26,7 +26,7 @@ def sanitize_path(name):
 
 
 def yaml_safe(value):
-    return value.replace('"', "'").strip()
+    return value.replace('"', "'").replace("\\", "/").strip()
 
 
 def today():

@@ -2,7 +2,8 @@
 
 The declared boundary of the job-search module. When the Phase-2 modules/
 architecture lands, modules/jobs/ is a mechanical move of exactly these files;
-until then, nothing job-related may live outside this set. (Backticked paths in
+until then, this is the maintained enumeration of the module's files —
+machine-checked one way (every listed path must exist in the repo). (Backticked paths in
 this file are machine-checked against the repo — keep them real.)
 
 ## Skills

@@ -6,7 +6,7 @@ tags: [job-search, cover-letter]
 # Cover Letter — Base
 
 > Paragraphs 1 + 3 are your reusable voice; paragraph 2 is rebuilt per role; the
-> closing names the exact role/team. Run the judge loop (Plan 3) to ≥80 before sending.
+> closing names the exact role/team. Run the judge loop to ≥80 before sending.
 
 **P1 (reusable hook):** <who you are in one honest line>
 
