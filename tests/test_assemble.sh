@@ -76,6 +76,28 @@ print(fl[0]['src'], '|', fl[0]['dest']); print(fl[1]['dest'])")"
   assert_contains "$punit" "scripts/jobs/jobslib.py | scripts/jobs/jobslib.py" "files parser defaults dest to src"
   assert_contains "$punit" "applications/Applications.md" "files parser reads explicit dest"
 
+  # --- fence-aware section split: '## ' inside a fenced block is NOT a heading ---
+  fsec="$("$PY" -c "
+import sys; sys.path.insert(0,'$ROOT_PY'); import assemble as a
+body='''## Creates
+- t/tmpl.md — a template
+\`\`\`
+# Title
+## Prompt
+what happened?
+\`\`\`
+
+## CLAUDE.md snippet
+\`\`\`
+- x
+\`\`\`
+'''
+secs=a._split_sections(body)
+print('KEYS', sorted(secs.keys()))
+print('CREATES_HAS_PROMPT', '## Prompt' in secs['Creates'])")"
+  assert_contains "$fsec" "KEYS ['CLAUDE.md snippet', 'Creates']" "fenced '## ' lines do not create sections"
+  assert_contains "$fsec" "CREATES_HAS_PROMPT True" "fenced '## ' stays inside its section body"
+
   # --- resolution: deterministic topo order, cycle + unknown errors ---
   res="$("$PY" -c "
 import sys; sys.path.insert(0,'$ROOT_PY'); import assemble as a

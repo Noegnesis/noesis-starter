@@ -59,11 +59,17 @@ def _split_frontmatter(text, path):
 
 
 def _split_sections(body):
-    """{section title: text} for every '## ' heading in the body."""
+    """{section title: text} for every '## ' heading in the body.
+    Fence-aware: a '## ' line inside a ``` fence is content, not a heading."""
     sections = {}
-    current, lines = None, []
+    current, lines, in_fence = None, [], False
     for line in body.splitlines():
-        if line.startswith("## "):
+        if _FENCE_RE.match(line):
+            in_fence = not in_fence
+            if current is not None:
+                lines.append(line)
+            continue
+        if not in_fence and line.startswith("## "):
             if current is not None:
                 sections[current] = "\n".join(lines).strip("\n")
             current, lines = line[3:].strip(), []
@@ -77,7 +83,8 @@ def _split_sections(body):
 def parse_module(path):
     path = Path(path)
     fm, body = _split_frontmatter(path.read_text(encoding="utf-8"), path.name)
-    return {"fm": fm, "sections": _split_sections(body), "path": path}
+    return {"fm": fm, "sections": _split_sections(body), "path": path,
+            "body": body}
 
 
 def parse_questions(text):
