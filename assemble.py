@@ -32,7 +32,7 @@ MARK_END = "<!-- noesis:modules:end -->"
 
 _Q_RE = re.compile(r"^- (?P<key>[a-z][a-z0-9_]*) — (?P<prompt>.+?)"
                    r"(?: \(default: (?P<default>.*)\))?$")
-_SEED_RE = re.compile(r"^- (?P<path>\S+) — (?P<desc>.+)$")
+_SEED_RE = re.compile(r"^- (?P<path>.+?) — (?P<desc>.+)$")
 _FILE_RE = re.compile(r"^- `(?P<src>[^`]+)`(?: → `(?P<dest>[^`]+)`)?$")
 _FENCE_RE = re.compile(r"^```")
 
