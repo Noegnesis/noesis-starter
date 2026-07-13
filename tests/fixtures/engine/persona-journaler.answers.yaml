@@ -1,0 +1,7 @@
+# Generic journaler persona — core capture + the journal/reflection layer.
+inbox:
+  sort_cadence: every Sunday
+daily:
+  daily_focus: today's one big rock
+journal-reflection:
+  reflection_cadence: weekly

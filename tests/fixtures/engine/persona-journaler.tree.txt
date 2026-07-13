@@ -1,0 +1,6 @@
+CLAUDE.md
+daily/
+inbox/
+journal/
+reflections/
+reflections/Reflection Template.md

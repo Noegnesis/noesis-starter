@@ -37,7 +37,7 @@ else
   assert_eq "$vrc" "0" "shipped modules validate clean"
   assert_contains "$vout" "modules OK" "validate prints modules OK"
   assert_contains "$vout" "inbox" "validate names the module ids"
-  assert_contains "$vout" "6 module(s)" "all six core docs validate"
+  assert_contains "$vout" "7 module(s)" "all seven shipped docs validate"
 
   # a broken doc produces named problems and exit 1
   mkdir -p "$TMP/badmods"
@@ -308,5 +308,25 @@ print('\n'.join(sorted(entries)))" | tr -d '\r')"
   assert_eq "$tree_actual" "$(tr -d '\r' < "$ROOT/tests/fixtures/engine/golden-tree.txt")" "golden tree matches"
   region_actual="$(sed -n '/noesis:modules:start/,/noesis:modules:end/p' "$G/CLAUDE.md" | tr -d '\r')"
   assert_eq "$region_actual" "$(tr -d '\r' < "$ROOT/tests/fixtures/engine/golden-claude-region.md")" "golden CLAUDE.md region matches"
+
+  # --- persona golden: journaler (journal/reflection layer, fenced seed) ---
+  PJ="$TMP/pj"; mkdir -p "$PJ"
+  "$PY" "$ASM" --select daily,journal-reflection \
+     --answers "$ROOT/tests/fixtures/engine/persona-journaler.answers.yaml" \
+     --dest "$PJ" --execute >/dev/null
+  pj_tree="$("$PY" -c "
+from pathlib import Path
+root=Path('$TMP_PY/pj'); out=[]
+for p in sorted(root.rglob('*')):
+    rel=p.relative_to(root).as_posix()
+    if rel.startswith('CLAUDE.md.bak'): continue
+    out.append(rel+'/' if p.is_dir() else rel)
+print('\n'.join(sorted(out)))" | tr -d '\r')"
+  assert_eq "$pj_tree" "$(tr -d '\r' < "$ROOT/tests/fixtures/engine/persona-journaler.tree.txt")" "journaler golden tree matches"
+  pj_region="$(sed -n '/noesis:modules:start/,/noesis:modules:end/p' "$PJ/CLAUDE.md" | tr -d '\r')"
+  assert_eq "$pj_region" "$(tr -d '\r' < "$ROOT/tests/fixtures/engine/persona-journaler.claude-region.md")" "journaler golden region matches"
+  pj_seed="$(cat "$PJ/reflections/Reflection Template.md")"
+  assert_contains "$pj_seed" "## What happened" "fenced '## ' headings survive into the rendered seed"
+  assert_contains "$pj_seed" "write this weekly" "seed placeholders render from answers"
 fi
 finish
