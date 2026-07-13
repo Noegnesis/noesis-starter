@@ -37,7 +37,7 @@ else
   assert_eq "$vrc" "0" "shipped modules validate clean"
   assert_contains "$vout" "modules OK" "validate prints modules OK"
   assert_contains "$vout" "inbox" "validate names the module ids"
-  assert_contains "$vout" "9 module(s)" "all nine shipped docs validate"
+  assert_contains "$vout" "10 module(s)" "all ten shipped docs validate"
 
   # a broken doc produces named problems and exit 1
   mkdir -p "$TMP/badmods"
