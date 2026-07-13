@@ -37,7 +37,7 @@ else
   assert_eq "$vrc" "0" "shipped modules validate clean"
   assert_contains "$vout" "modules OK" "validate prints modules OK"
   assert_contains "$vout" "inbox" "validate names the module ids"
-  assert_contains "$vout" "7 module(s)" "all seven shipped docs validate"
+  assert_contains "$vout" "8 module(s)" "all eight shipped docs validate"
 
   # a broken doc produces named problems and exit 1
   mkdir -p "$TMP/badmods"
@@ -328,5 +328,23 @@ print('\n'.join(sorted(out)))" | tr -d '\r')"
   pj_seed="$(cat "$PJ/reflections/Reflection Template.md")"
   assert_contains "$pj_seed" "## What happened" "fenced '## ' headings survive into the rendered seed"
   assert_contains "$pj_seed" "write this weekly" "seed placeholders render from answers"
+
+  # --- persona golden: researcher (persona module depends_on a core module) ---
+  PR="$TMP/pr"; mkdir -p "$PR"
+  "$PY" "$ASM" --select research-augment \
+     --answers "$ROOT/tests/fixtures/engine/persona-researcher.answers.yaml" \
+     --dest "$PR" --execute >/dev/null
+  pr_tree="$("$PY" -c "
+from pathlib import Path
+root=Path('$TMP_PY/pr'); out=[]
+for p in sorted(root.rglob('*')):
+    rel=p.relative_to(root).as_posix()
+    if rel.startswith('CLAUDE.md.bak'): continue
+    out.append(rel+'/' if p.is_dir() else rel)
+print('\n'.join(sorted(out)))" | tr -d '\r')"
+  assert_eq "$pr_tree" "$(tr -d '\r' < "$ROOT/tests/fixtures/engine/persona-researcher.tree.txt")" "researcher golden tree matches"
+  pr_region="$(sed -n '/noesis:modules:start/,/noesis:modules:end/p' "$PR/CLAUDE.md" | tr -d '\r')"
+  assert_eq "$pr_region" "$(tr -d '\r' < "$ROOT/tests/fixtures/engine/persona-researcher.claude-region.md")" "researcher golden region matches"
+  assert_contains "$pr_region" "### Research & Notes" "depends_on pulls the core research module into the region"
 fi
 finish

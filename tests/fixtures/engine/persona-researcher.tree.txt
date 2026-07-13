@@ -1,0 +1,4 @@
+CLAUDE.md
+research/
+research/Literature Notes.md
+research/sources/
