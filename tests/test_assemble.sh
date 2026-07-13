@@ -75,5 +75,59 @@ print(fl[0]['src'], '|', fl[0]['dest']); print(fl[1]['dest'])")"
   assert_contains "$punit" "people/People.md | index of people notes" "creates parser splits seeds"
   assert_contains "$punit" "scripts/jobs/jobslib.py | scripts/jobs/jobslib.py" "files parser defaults dest to src"
   assert_contains "$punit" "applications/Applications.md" "files parser reads explicit dest"
+
+  # --- resolution: deterministic topo order, cycle + unknown errors ---
+  res="$("$PY" -c "
+import sys; sys.path.insert(0,'$ROOT_PY'); import assemble as a
+mods=a.load_modules('$ROOT_PY/modules')
+print(a.resolve(['daily','archive'],mods))
+try:
+    a.resolve(['nope'],mods)
+except a.ModuleError as e:
+    print('ERR', e)")"
+  assert_contains "$res" "['archive', 'inbox', 'daily']" "resolve pulls deps and sorts deterministically"
+  assert_contains "$res" "ERR" "unknown module id raises"
+  assert_contains "$res" "nope" "error names the unknown id"
+
+  cyc="$("$PY" -c "
+import sys; sys.path.insert(0,'$ROOT_PY'); import assemble as a
+mods={'a':{'fm':{'id':'a','depends_on':['b']}},'b':{'fm':{'id':'b','depends_on':['a']}}}
+try:
+    a.resolve(['a'],mods)
+except a.ModuleError as e:
+    print('CYCLE', e)")"
+  assert_contains "$cyc" "CYCLE" "dependency cycles raise"
+
+  # --- rendering: answer > default > named missing ---
+  ren="$("$PY" -c "
+import sys; sys.path.insert(0,'$ROOT_PY'); import assemble as a
+qs=[{'key':'x','prompt':'','default':'dflt'}]
+print(a.render('v={{x}}','m',{'m':{'x':'ans'}},qs))
+print(a.render('v={{x}}','m',{},qs))
+print(a.render('v={{y}}','m',{},qs))")"
+  assert_contains "$ren" "('v=ans', [])" "answers win"
+  assert_contains "$ren" "('v=dflt', [])" "defaults fill"
+  assert_contains "$ren" "'m.y'" "missing keys are named module.key"
+
+  # --- dry-run: full plan printed, nothing written ---
+  mkdir -p "$TMP/vault1"
+  cat > "$TMP/answers.yaml" <<'EOF'
+inbox:
+  sort_cadence: daily
+daily:
+  daily_focus: top 3 priorities
+EOF
+  dryout="$("$PY" "$ASM" --select daily --answers "$TMP/answers.yaml" --dest "$TMP/vault1")"; drc=$?
+  assert_eq "$drc" "0" "dry-run exits 0"
+  assert_contains "$dryout" "inbox/" "plan lists dependency folders"
+  assert_contains "$dryout" "daily/" "plan lists selected folders"
+  assert_contains "$dryout" "cadence: daily" "plan renders answers into the region preview"
+  assert_contains "$dryout" "dry-run" "plan says it wrote nothing"
+  assert_eq "$(ls "$TMP/vault1" | wc -l | tr -d ' ')" "0" "dry-run writes nothing"
+
+  # missing required answer is a named error
+  miss="$("$PY" "$ASM" --select people --answers "$TMP/answers.yaml" --dest "$TMP/vault1" 2>&1)"; mrc=$?
+  assert_eq "$mrc" "0" "people renders via default (exit 0)"
+  assert_contains "$miss" "contact info and last conversation" "question defaults render in the plan"
 fi
 finish

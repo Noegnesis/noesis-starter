@@ -197,14 +197,159 @@ def _cmd_validate(modules_dir):
     return 0
 
 
+def resolve(selected, mods):
+    """Topological order over selected + transitive depends_on.
+    Kahn's algorithm with the ready list kept sorted -> deterministic."""
+    needed, stack = set(), list(selected)
+    while stack:
+        mid = stack.pop()
+        if mid in needed:
+            continue
+        if mid not in mods:
+            raise ModuleError(f"unknown module id: {mid}")
+        needed.add(mid)
+        stack.extend(mods[mid]["fm"].get("depends_on") or [])
+    deps = {m: [d for d in (mods[m]["fm"].get("depends_on") or []) if d in needed]
+            for m in needed}
+    order, ready = [], sorted(m for m in needed if not deps[m])
+    while ready:
+        mid = ready.pop(0)
+        order.append(mid)
+        newly = []
+        for m in needed:
+            if m not in order and m not in ready and mid in deps[m]:
+                deps[m] = [d for d in deps[m] if d != mid]
+                if not deps[m]:
+                    newly.append(m)
+        ready = sorted(ready + newly)
+    if len(order) != len(needed):
+        stuck = sorted(needed - set(order))
+        raise ModuleError(f"dependency cycle involving: {', '.join(stuck)}")
+    return order
+
+
+def render(text, module_id, answers, questions):
+    """Fill {{key}} from answers[module_id][key], else the question default.
+    Returns (rendered, missing) where missing entries are 'module.key'."""
+    bykey = {q["key"]: q for q in questions}
+    mod_answers = (answers or {}).get(module_id) or {}
+    missing = []
+
+    def _sub(m):
+        key = m.group(1)
+        if key in mod_answers and mod_answers[key] is not None:
+            return str(mod_answers[key])
+        q = bykey.get(key)
+        if q and q.get("default") is not None:
+            return q["default"]
+        missing.append(f"{module_id}.{key}")
+        return m.group(0)
+
+    return re.sub(r"\{\{([a-z][a-z0-9_]*)\}\}", _sub, text or ""), missing
+
+
+def build_plan(order, mods, answers):
+    folders, seeds, copies, blocks, errors = [], [], [], [], []
+    for mid in order:
+        mod = mods[mid]
+        qs = parse_questions(mod["sections"].get("Questions", ""))
+        creates = parse_creates(mod["sections"].get("Creates", ""))
+        for f in creates["folders"]:
+            if f not in folders:
+                folders.append(f)
+        for s in creates["seeds"]:
+            content = s["content"] if s["content"] is not None else f"# {s['desc']}"
+            rendered, miss = render(content, mid, answers, qs)
+            errors.extend(f"missing answer: {k}" for k in miss)
+            seeds.append({"path": s["path"], "content": rendered})
+        copies.extend(parse_files(mod["sections"].get("Files", "")))
+        snippet, miss = render(_first_fence(
+            mod["sections"]["CLAUDE.md snippet"]) or "", mid, answers, qs)
+        errors.extend(f"missing answer: {k}" for k in miss)
+        block = f"### {mod['fm'].get('title', mid)}\n{snippet}"
+        rules, miss2 = render(mod["sections"].get("Memory rules", ""), mid,
+                              answers, qs)
+        errors.extend(f"missing answer: {k}" for k in miss2)
+        if rules.strip():
+            block += "\n" + rules.strip()
+        blocks.append(block)
+    region = (MARK_START + "\n"
+              + "<!-- Assembled by assemble.py — re-run it to update; "
+                "edit outside this region. -->\n\n"
+              + "\n\n".join(blocks) + "\n" + MARK_END)
+    return {"order": order, "folders": folders, "seeds": seeds,
+            "copies": copies, "region": region, "errors": errors}
+
+
+def _load_answers(path):
+    if not path:
+        return {}
+    p = Path(path)
+    if not p.exists():
+        raise ModuleError(f"answers file not found: {p}")
+    data = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+    if not isinstance(data, dict):
+        raise ModuleError("answers file must be a YAML mapping of module ids")
+    return data
+
+
+def _print_plan(plan, dest):
+    print(f"assemble plan -> {dest}")
+    print(f"modules ({len(plan['order'])}): {', '.join(plan['order'])}")
+    print("folders:")
+    for f in plan["folders"]:
+        print(f"  {f}")
+    for s in plan["seeds"]:
+        print(f"seed: {s['path']}")
+    for c in plan["copies"]:
+        print(f"copy: {c['src']} -> {c['dest']}")
+    print("--- CLAUDE.md managed region ---")
+    print(plan["region"])
+
+
+def _apply_plan(plan, dest):  # replaced in the next task
+    raise ModuleError("--execute not implemented yet")
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description="noesis module assembler")
     p.add_argument("--modules", default=str(Path(__file__).resolve().parent / "modules"))
     p.add_argument("--validate", action="store_true")
+    p.add_argument("--select", default="")
+    p.add_argument("--answers", default="")
+    p.add_argument("--dest", default="")
+    p.add_argument("--execute", action="store_true",
+                   help="actually write (default: dry-run)")
     args = p.parse_args(argv)
+
     if args.validate:
         return _cmd_validate(args.modules)
-    p.error("nothing to do — pass --validate (build mode arrives in a later task)")
+    if not args.select or not args.dest:
+        p.error("build mode needs --select and --dest (or use --validate)")
+    try:
+        mods = load_modules(args.modules)
+        problems = []
+        for mod in mods.values():
+            problems.extend(validate_module(mod))
+        if problems:
+            for prob in problems:
+                print(f"problem: {prob}")
+            return 1
+        selected = [s.strip() for s in args.select.split(",") if s.strip()]
+        order = resolve(selected, mods)
+        plan = build_plan(order, mods, _load_answers(args.answers))
+    except ModuleError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 1
+    if plan["errors"]:
+        for err in plan["errors"]:
+            print(f"problem: {err}")
+        return 1
+    _print_plan(plan, args.dest)
+    if not args.execute:
+        print("\n(dry-run — nothing written. add --execute to build.)")
+        return 0
+    return _apply_plan(plan, Path(args.dest))
 
 
 if __name__ == "__main__":
