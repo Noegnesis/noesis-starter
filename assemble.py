@@ -51,6 +51,8 @@ def _split_frontmatter(text, path):
         fm = yaml.safe_load(text[3:end]) or {}
     except yaml.YAMLError as e:
         raise ModuleError(f"{path}: invalid frontmatter YAML: {e}")
+    if not isinstance(fm, dict):
+        raise ModuleError(f"{path}: frontmatter must be a YAML mapping")
     return fm, text[end + 4:]
 
 
@@ -175,19 +177,23 @@ def load_modules(modules_dir):
 
 
 def _cmd_validate(modules_dir):
-    try:
-        mods = load_modules(modules_dir)
-    except ModuleError as e:
-        print(f"problem: {e}", file=sys.stderr)
-        return 1
-    problems = []
-    for mod in mods.values():
+    modules_dir = Path(modules_dir)
+    problems, ids = [], []
+    for p in sorted(modules_dir.glob("*.md")):
+        if p.name == "README.md":
+            continue
+        try:
+            mod = parse_module(p)
+        except ModuleError as e:
+            problems.append(str(e))
+            continue
         problems.extend(validate_module(mod))
+        ids.append(mod["fm"].get("id") or p.stem)
     if problems:
         for prob in problems:
             print(f"problem: {prob}")
         return 1
-    print(f"modules OK: {len(mods)} module(s): {', '.join(sorted(mods))}")
+    print(f"modules OK: {len(ids)} module(s): {', '.join(sorted(ids))}")
     return 0
 
 

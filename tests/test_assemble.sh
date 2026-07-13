@@ -42,11 +42,14 @@ title: Broken
 ## Concept
 x
 EOF
+  printf 'no frontmatter here\n' > "$TMP/badmods/zz-nofm.md"
   bout="$("$PY" "$ASM" --validate --modules "$TMP/badmods" 2>&1)"; brc=$?
   assert_eq "$brc" "1" "broken module exits 1"
   assert_contains "$bout" "id 'mismatch' does not match filename" "validator flags id/filename mismatch"
   assert_contains "$bout" "tier must be one of" "validator flags bad tier"
   assert_contains "$bout" "missing section: Questions" "validator flags missing required sections"
+  assert_contains "$bout" "zz-nofm.md" "parse failures aggregate across files"
+  assert_contains "$bout" "no frontmatter block" "parse failure is a named problem line"
 
   # parser unit checks: questions, creates, files
   punit="$("$PY" -c "
