@@ -44,7 +44,7 @@ It creates `applications/<Org Role>/` with a schema'd hub + `Job Description.md`
   the anchors this role rewards. Apply the user's `voice_rules` from config.
   If the lane's fragment file doesn't exist yet (it's seeded by /jobs-setup), write it fresh
   from the config's anchors + the Facts Ledger instead.
-- (Cover letters + the judge loop ship in the full pipeline — Plan 3.)
+- For cover letters on A-tier roles, run the judge loop — see section 8.
 
 ## 5. Track
 The hub carries `type: application`, so `Applications.base` picks it up automatically
