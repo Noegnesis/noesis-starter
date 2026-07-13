@@ -6,7 +6,7 @@ description: Ingest a job posting (URL or pasted JD), score fit against your con
 # Jobs — ingest → score → tailor → track
 
 Personalization lives in `applications/_jobs/config.md` (a fenced YAML block:
-profile, lanes, anchors, voice_rules, facts_ledger, fragments, discovery, paths).
+profile, lanes (+ discovery keywords), anchors, voice_rules, facts_ledger, fragments, discovery, paths).
 **If that config is missing or incomplete, offer to run `/jobs-setup`, or fill just
 the field this action needs (just-in-time), before continuing.**
 
@@ -49,6 +49,65 @@ It creates `applications/<Org Role>/` with a schema'd hub + `Job Description.md`
 ## 5. Track
 The hub carries `type: application`, so `Applications.base` picks it up automatically
 (or add a row to `Applications.md` for non-Obsidian users). Confirm the frontmatter is right.
+
+## 6. Discover mode (`/jobs discover`)
+
+Pull fresh roles from the config's `discovery` sources (ATS boards, feeds, Adzuna):
+
+```bash
+python scripts/jobs/discover.py --config applications/_jobs/config.md [--source ats|feeds|adzuna|all] [--lane <key>] [--limit N]
+```
+
+Dry-run first, review the digest, then re-run with `--execute` to write
+`status: discovered` stubs into the tracker. No Adzuna keys in `.env` → it warns
+and runs ATS + feeds only. Lanes need `keywords` in the config to filter; offer
+to fill them (JIT) if they're empty.
+
+## 7. Score mode (`/jobs score`)
+
+Work the `discovered` queue honestly: read each stub (and its source URL if more
+context is needed), score it the same way as step 2, then persist the verdict:
+
+```bash
+python scripts/jobs/annotate.py --config applications/_jobs/config.md \
+  --hub "applications/<Org Role>/<Org Role>.md" \
+  --tier A|B|C --fit-score <0-100> --lane <key> --eligibility ok|blocked|check --why "<one line>"
+```
+
+Tier C or blocked eligibility → also `--status archived`. A seniority/YOE hard
+fail caps the tier at C no matter how good the topic fit is.
+
+## 8. Cover letter + judge loop (for A-tier roles)
+
+Draft from `applications/Cover Letter - Base.md`: P1 + P3 are the user's reusable
+voice, P2 is rebuilt for THIS role from real anchors, the close names the exact
+role/team. Then run the judge loop:
+
+1. Two fresh judge passes on the draft: an **ATS screen** (are the JD's top
+   requirements literally evidenced?) and a **hiring-manager skim** (would a
+   30-second read want to meet this person?). Each scores 0-100 with the
+   3 weakest points named.
+2. Revise and re-judge until **both scores ≥ 80** with no fabricated claim
+   (check every claim against the Facts Ledger).
+3. Keep every version: the final lives in the kit as
+   `Cover Letter - <Role> (FINAL).md` with the scores in its frontmatter, and
+   EVERY version gets a row in the base file's **Cover Letter Ledger** table.
+
+The same loop applies to a tailored résumé when the user asks for the full treatment.
+
+## 9. Scan mode (`/jobs scan`)
+
+Multi-agent company scan — expensive, so it is cost-gated:
+
+1. Build a one-paragraph profile summary from the config (lanes + top anchors —
+   no file paths, no secrets) and take the user's company list.
+2. Run `workflows/company-scan.js` via the Workflow tool with
+   `{profile, lanes, companies, confirm: false}` — it returns a token estimate
+   and runs nothing.
+3. Show the estimate. Only after the user explicitly accepts the cost, re-run
+   with `confirm: true`. Default cap is 5 companies (`allowLarge: true` to go
+   bigger — warn again).
+4. Cross-check the shortlist's URLs before scaffolding kits (step 3 above).
 
 ## Notes
 - `scaffold.py` is dry-run by default — always preview, then `--execute`.

@@ -284,6 +284,10 @@ safe_cp "$SCRIPT_DIR/scripts/jobs/jobslib.py"           "$VAULT_PATH/scripts/job
 safe_cp "$SCRIPT_DIR/scripts/jobs/scaffold.py"          "$VAULT_PATH/scripts/jobs/scaffold.py"
 safe_cp "$SCRIPT_DIR/scripts/jobs/templates/kit-hub.md" "$VAULT_PATH/scripts/jobs/templates/kit-hub.md"
 safe_cp "$SCRIPT_DIR/scripts/jobs/templates/resume-fragment.md" "$VAULT_PATH/scripts/jobs/templates/resume-fragment.md"
+safe_cp "$SCRIPT_DIR/scripts/jobs/discover.py"          "$VAULT_PATH/scripts/jobs/discover.py"
+safe_cp "$SCRIPT_DIR/scripts/jobs/annotate.py"          "$VAULT_PATH/scripts/jobs/annotate.py"
+mkdir -p "$VAULT_PATH/workflows"
+safe_cp "$SCRIPT_DIR/workflows/company-scan.js"         "$VAULT_PATH/workflows/company-scan.js"
 
 # applications/ scaffold (Facts Ledger, config template, trackers) — never
 # overwrite on re-run, since it may already hold the user's real kits

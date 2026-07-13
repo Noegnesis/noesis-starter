@@ -344,7 +344,7 @@ foreach ($script in @("process_docs_to_obsidian.py", "process_files_with_gemini.
 
 # Copy scripts/jobs/ (config-driven job-pipeline scaffolder)
 New-Item -ItemType Directory -Force -Path "$vaultPath\scripts\jobs\templates" | Out-Null
-foreach ($jobsFile in @("jobslib.py", "scaffold.py")) {
+foreach ($jobsFile in @("jobslib.py", "scaffold.py", "discover.py", "annotate.py")) {
     if (Test-Path "$scriptDir\scripts\jobs\$jobsFile") {
         Copy-Item "$scriptDir\scripts\jobs\$jobsFile" "$vaultPath\scripts\jobs\" -Force
     }
@@ -354,6 +354,10 @@ if (Test-Path "$scriptDir\scripts\jobs\templates\kit-hub.md") {
 }
 if (Test-Path "$scriptDir\scripts\jobs\templates\resume-fragment.md") {
     Copy-Item "$scriptDir\scripts\jobs\templates\resume-fragment.md" "$vaultPath\scripts\jobs\templates\" -Force
+}
+New-Item -ItemType Directory -Force -Path "$vaultPath\workflows" | Out-Null
+if (Test-Path "$scriptDir\workflows\company-scan.js") {
+    Copy-Item "$scriptDir\workflows\company-scan.js" "$vaultPath\workflows\" -Force
 }
 
 # applications/ scaffold (Facts Ledger, config template, trackers) -- never
