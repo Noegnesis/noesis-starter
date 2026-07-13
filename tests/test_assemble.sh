@@ -247,9 +247,9 @@ for p in sorted(root.rglob('*')):
     rel=p.relative_to(root).as_posix()
     if rel.startswith('CLAUDE.md.bak'): continue
     entries.append(rel+'/' if p.is_dir() else rel)
-print('\n'.join(sorted(entries)))")"
-  assert_eq "$tree_actual" "$(cat "$ROOT/tests/fixtures/engine/golden-tree.txt")" "golden tree matches"
-  region_actual="$(sed -n '/noesis:modules:start/,/noesis:modules:end/p' "$G/CLAUDE.md")"
-  assert_eq "$region_actual" "$(cat "$ROOT/tests/fixtures/engine/golden-claude-region.md")" "golden CLAUDE.md region matches"
+print('\n'.join(sorted(entries)))" | tr -d '\r')"
+  assert_eq "$tree_actual" "$(tr -d '\r' < "$ROOT/tests/fixtures/engine/golden-tree.txt")" "golden tree matches"
+  region_actual="$(sed -n '/noesis:modules:start/,/noesis:modules:end/p' "$G/CLAUDE.md" | tr -d '\r')"
+  assert_eq "$region_actual" "$(tr -d '\r' < "$ROOT/tests/fixtures/engine/golden-claude-region.md")" "golden CLAUDE.md region matches"
 fi
 finish
