@@ -1,0 +1,8 @@
+CLAUDE.md
+archive/
+daily/
+inbox/
+people/
+people/People.md
+projects/
+research/

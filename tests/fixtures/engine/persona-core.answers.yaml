@@ -1,0 +1,7 @@
+# Generic core persona — six core modules, everything answered explicitly.
+inbox:
+  sort_cadence: every Friday
+daily:
+  daily_focus: top 3 priorities
+people:
+  people_fields: contact info and last conversation
