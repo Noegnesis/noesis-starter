@@ -376,7 +376,6 @@ def run_discovery(cfg, config_path, source, lane, limit, execute, *,
     apps_dir = jobslib.resolve_paths(cfg, config_path)["applications_dir"]
     config_dir = Path(config_path).resolve().parent
     state_dir = config_dir / "state"
-    ensure_state(state_dir)
 
     raw = []
     if source in ("ats", "all"):
@@ -408,7 +407,11 @@ def run_discovery(cfg, config_path, source, lane, limit, execute, *,
         r["liveness"] = verify_liveness(r, is_live=is_live)
     live = sum(1 for r in filtered if r["liveness"] == "verified")
 
-    state = json.loads((state_dir / "run-state.json").read_text(encoding="utf-8"))
+    rs = state_dir / "run-state.json"
+    if rs.exists():
+        state = json.loads(rs.read_text(encoding="utf-8"))
+    else:
+        state = {"seen_stable_keys": [], "last_run": ""}
     existing = load_existing(apps_dir, state.get("seen_stable_keys", []))
     fresh, _ = dedupe(filtered, existing)
     if limit:
@@ -428,11 +431,12 @@ def run_discovery(cfg, config_path, source, lane, limit, execute, *,
                 print(f"  [skip write] {co} — {ro}: {e}", file=sys.stderr)
 
     today = scaffold.today()
-    append_run_ledger({"date": today, "source": source, "fetched": fetched,
-                       "filtered": len(filtered), "live": live,
-                       "net_new": len(fresh), "written": written},
-                      state_dir / "discover-runs.tsv")
     if execute:
+        ensure_state(state_dir)
+        append_run_ledger({"date": today, "source": source, "fetched": fetched,
+                           "filtered": len(filtered), "live": live,
+                           "net_new": len(fresh), "written": written},
+                          state_dir / "discover-runs.tsv")
         update_run_state(state_dir / "run-state.json", written_keys, today)
     return {"fetched": fetched, "filtered": len(filtered), "live": live,
             "net_new": len(fresh), "written": written, "digest": digest}

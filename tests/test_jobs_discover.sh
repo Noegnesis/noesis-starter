@@ -89,6 +89,7 @@ print(len(fresh),len(skipped)); print(fresh[0]['stable_key'])")"
   assert_contains "$dry" "fetched=0" "dry run reports zero fetched"
   assert_contains "$dry" "dry-run" "dry run says nothing was written"
   assert_eq "$(ls "$TMP/applications" | grep -cv '^_jobs$')" "0" "dry run writes no kit folders"
+  assert_eq "$([ -d "$TMP/applications/_jobs/state" ] && echo yes || echo no)" "no" "dry run writes no state dir"
 
   # write_stub goes through scaffold's template: discovered hub with jd placeholder
   st="$("$PY" -c "
