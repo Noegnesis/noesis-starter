@@ -32,21 +32,17 @@ assert_contains "$guide" "judge loop" "guide teaches the judge loop"
 assert_contains "$guide" "caps the tier at C" "guide carries the seniority hard-fail rule"
 front="$(cat "$ROOT/docs/README.md")"
 assert_contains "$front" "advanced/job-search.md" "front door indexes the job-search guide"
-MF="$ROOT/skills/jobs/module.manifest.md"
-assert_file_exists "$MF" "module manifest ships"
-mf="$(cat "$MF")"
+# Phase-2: the flat manifest is retired; modules/jobs.md is the validated declaration
+# (assemble.py --validate machine-checks its ## Files payload — see test_assemble.sh's
+# "10 module(s)" assertion, which only passes if every jobs source exists in the repo).
+MOD="$ROOT/modules/jobs.md"
+assert_file_exists "$MOD" "jobs module doc ships"
+assert_eq "$([ -f "$ROOT/skills/jobs/module.manifest.md" ] && echo yes || echo no)" "no" "flat manifest retired"
+md="$(cat "$MOD")"
 for f in scripts/jobs/jobslib.py scripts/jobs/scaffold.py scripts/jobs/discover.py \
-         scripts/jobs/annotate.py workflows/company-scan.js skills/jobs/SKILL.md \
-         skills/jobs-setup/SKILL.md docs/advanced/job-search.md; do
-  assert_contains "$mf" "$f" "manifest lists $f"
+         scripts/jobs/annotate.py workflows/company-scan.js docs/advanced/job-search.md; do
+  assert_contains "$md" "$f" "jobs module declares $f"
 done
-missing=""
-while IFS= read -r path; do
-  case "$path" in
-    */*) [ -e "$ROOT/$path" ] || missing="$missing |$path";;
-  esac
-done <<MANIFEST_PATHS
-$(grep -oE '`[^`]+`' "$MF" | tr -d '\`')
-MANIFEST_PATHS
-if [ -z "$missing" ]; then pass "every manifested path exists"; else fail "manifest lists missing paths:$missing"; fi
+assert_contains "$md" "Applications.base" "jobs module declares the tracker payload"
+assert_contains "$md" "jobs-setup" "jobs module defers onboarding to /jobs-setup"
 finish
