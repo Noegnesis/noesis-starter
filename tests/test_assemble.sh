@@ -9,6 +9,14 @@ ASM="$ROOT/assemble.py"
 assert_file_exists "$ASM" "assemble ships"
 assert_file_exists "$ROOT/modules/README.md" "schema contract ships"
 assert_file_exists "$ROOT/modules/inbox.md" "inbox module doc ships"
+for m in daily projects research archive people; do
+  assert_file_exists "$ROOT/modules/$m.md" "$m module doc ships"
+done
+daily_doc="$(cat "$ROOT/modules/daily.md")"
+assert_contains "$daily_doc" "depends_on: [inbox]" "daily depends on inbox"
+people_doc="$(cat "$ROOT/modules/people.md")"
+assert_contains "$people_doc" "default: false" "people is opt-in"
+assert_contains "$people_doc" "people/People.md — " "people ships a seed file"
 readme="$(cat "$ROOT/modules/README.md")"
 assert_contains "$readme" "depends_on" "contract documents depends_on"
 assert_contains "$readme" "## Files" "contract documents the optional payload section"
@@ -29,6 +37,7 @@ else
   assert_eq "$vrc" "0" "shipped modules validate clean"
   assert_contains "$vout" "modules OK" "validate prints modules OK"
   assert_contains "$vout" "inbox" "validate names the module ids"
+  assert_contains "$vout" "6 module(s)" "all six core docs validate"
 
   # a broken doc produces named problems and exit 1
   mkdir -p "$TMP/badmods"
