@@ -181,8 +181,13 @@ def validate_module(mod):
             problems.append(f"{path.name}: unparseable question bullet: {s}")
     if _has_unterminated_fence(mod.get("body", "")):
         problems.append(f"{path.name}: unterminated fenced block")
+    repo_root = Path(__file__).resolve().parent
     for f in parse_files(sections.get("Files", "")):
-        if not (Path(__file__).resolve().parent / f["src"]).exists():
+        src_abs = (repo_root / f["src"]).resolve()
+        if src_abs != repo_root and repo_root not in src_abs.parents:
+            problems.append(f"{path.name}: Files source escapes the repo: "
+                            f"{f['src']}")
+        elif not (repo_root / f["src"]).exists():
             problems.append(f"{path.name}: Files source missing from repo: "
                             f"{f['src']}")
     return problems

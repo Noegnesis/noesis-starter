@@ -78,6 +78,35 @@ x
 EOF
   cp "$TMP/badmods/wrong-id.md" "$TMP/badmods/dup-a.md"
   cp "$TMP/badmods/wrong-id.md" "$TMP/badmods/dup-b.md"
+  cat > "$TMP/badmods/escape.md" <<'EOF'
+---
+id: escape
+tier: advanced
+title: Escape Fixture
+depends_on: []
+suggests: []
+default: false
+---
+
+## Concept
+x
+
+## Applies when
+x
+
+## Questions
+
+## Creates
+- x/
+
+## CLAUDE.md snippet
+```
+- x
+```
+
+## Files
+- `../../../etc/passwd`
+EOF
   bout="$("$PY" "$ASM" --validate --modules "$TMP/badmods" 2>&1)"; brc=$?
   assert_eq "$brc" "1" "broken module exits 1"
   assert_contains "$bout" "id 'mismatch' does not match filename" "validator flags id/filename mismatch"
@@ -89,6 +118,7 @@ EOF
   assert_contains "$bout" "unparseable question bullet" "validator flags a malformed question bullet"
   assert_contains "$bout" "unterminated fenced block" "validator flags an unterminated fence"
   assert_contains "$bout" "duplicate module id: mismatch" "validator flags duplicate ids across files"
+  assert_contains "$bout" "Files source escapes the repo: ../../../etc/passwd" "validator flags a Files src that climbs out of the repo"
 
   # parser unit checks: questions, creates, files
   punit="$("$PY" -c "
