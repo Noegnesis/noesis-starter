@@ -52,6 +52,32 @@ title: Broken
 x
 EOF
   printf 'no frontmatter here\n' > "$TMP/badmods/zz-nofm.md"
+  cat > "$TMP/badmods/badbody.md" <<'EOF'
+---
+id: badbody
+tier: persona
+title: Bad Body
+default: maybe
+---
+
+## Concept
+x
+
+## Applies when
+x
+
+## Questions
+- this is not a valid question bullet
+
+## Creates
+- x/
+
+## CLAUDE.md snippet
+```
+- unterminated fence, no closing ticks
+EOF
+  cp "$TMP/badmods/wrong-id.md" "$TMP/badmods/dup-a.md"
+  cp "$TMP/badmods/wrong-id.md" "$TMP/badmods/dup-b.md"
   bout="$("$PY" "$ASM" --validate --modules "$TMP/badmods" 2>&1)"; brc=$?
   assert_eq "$brc" "1" "broken module exits 1"
   assert_contains "$bout" "id 'mismatch' does not match filename" "validator flags id/filename mismatch"
@@ -59,6 +85,10 @@ EOF
   assert_contains "$bout" "missing section: Questions" "validator flags missing required sections"
   assert_contains "$bout" "zz-nofm.md" "parse failures aggregate across files"
   assert_contains "$bout" "no frontmatter block" "parse failure is a named problem line"
+  assert_contains "$bout" "default must be true or false" "validator flags non-bool default"
+  assert_contains "$bout" "unparseable question bullet" "validator flags a malformed question bullet"
+  assert_contains "$bout" "unterminated fenced block" "validator flags an unterminated fence"
+  assert_contains "$bout" "duplicate module id: mismatch" "validator flags duplicate ids across files"
 
   # parser unit checks: questions, creates, files
   punit="$("$PY" -c "

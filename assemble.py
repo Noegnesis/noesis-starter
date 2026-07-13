@@ -145,6 +145,11 @@ def _first_fence(text):
     return None
 
 
+def _has_unterminated_fence(text):
+    return sum(1 for ln in (text or "").splitlines()
+               if _FENCE_RE.match(ln)) % 2 == 1
+
+
 def validate_module(mod):
     problems = []
     fm, sections, path = mod["fm"], mod["sections"], mod["path"]
@@ -158,6 +163,9 @@ def validate_module(mod):
                         f"got {fm.get('tier')!r}")
     if not fm.get("title"):
         problems.append(f"{path.name}: title is required")
+    if "default" in fm and not isinstance(fm["default"], bool):
+        problems.append(f"{path.name}: default must be true or false, "
+                        f"got {fm['default']!r}")
     for key in ("depends_on", "suggests"):
         if key in fm and not isinstance(fm[key], list):
             problems.append(f"{path.name}: {key} must be a list")
@@ -167,6 +175,12 @@ def validate_module(mod):
     if "CLAUDE.md snippet" in sections and _first_fence(
             sections["CLAUDE.md snippet"]) is None:
         problems.append(f"{path.name}: CLAUDE.md snippet has no fenced block")
+    for line in sections.get("Questions", "").splitlines():
+        s = line.rstrip()
+        if s.startswith("- ") and not _Q_RE.match(s):
+            problems.append(f"{path.name}: unparseable question bullet: {s}")
+    if _has_unterminated_fence(mod.get("body", "")):
+        problems.append(f"{path.name}: unterminated fenced block")
     for f in parse_files(sections.get("Files", "")):
         if not (Path(__file__).resolve().parent / f["src"]).exists():
             problems.append(f"{path.name}: Files source missing from repo: "
@@ -198,6 +212,13 @@ def _cmd_validate(modules_dir):
             continue
         problems.extend(validate_module(mod))
         ids.append(mod["fm"].get("id") or p.stem)
+    seen, dups = set(), set()
+    for i in ids:
+        if i in seen:
+            dups.add(i)
+        seen.add(i)
+    for d in sorted(dups):
+        problems.append(f"duplicate module id: {d}")
     if problems:
         for prob in problems:
             print(f"problem: {prob}")
