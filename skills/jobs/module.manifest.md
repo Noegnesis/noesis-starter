@@ -25,11 +25,11 @@ this file are machine-checked against the repo — keep them real.)
 - `vault-template/applications/_jobs/config.md`
 - `vault-template/applications/_jobs/.env.example`
 - `vault-template/applications/_jobs/.gitignore`
-- vault-template/applications/Facts Ledger.md
-- vault-template/applications/Cover Letter - Base.md
+- `vault-template/applications/Facts Ledger.md`
+- `vault-template/applications/Cover Letter - Base.md`
 - `vault-template/applications/Applications.base`
 - `vault-template/applications/Applications.md`
-- vault-template/applications/_sample-kit/Sample Co Sample Role/Sample Co Sample Role.md
+- `vault-template/applications/_sample-kit/Sample Co Sample Role/Sample Co Sample Role.md`
 
 ## Docs
 - `docs/advanced/job-search.md`

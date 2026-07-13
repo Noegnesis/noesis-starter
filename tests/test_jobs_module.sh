@@ -41,10 +41,12 @@ for f in scripts/jobs/jobslib.py scripts/jobs/scaffold.py scripts/jobs/discover.
   assert_contains "$mf" "$f" "manifest lists $f"
 done
 missing=""
-for path in $(grep -oE '`[^`]+`' "$MF" | tr -d '\`'); do
+while IFS= read -r path; do
   case "$path" in
-    */*) [ -e "$ROOT/$path" ] || missing="$missing $path";;
+    */*) [ -e "$ROOT/$path" ] || missing="$missing |$path";;
   esac
-done
+done <<MANIFEST_PATHS
+$(grep -oE '`[^`]+`' "$MF" | tr -d '\`')
+MANIFEST_PATHS
 if [ -z "$missing" ]; then pass "every manifested path exists"; else fail "manifest lists missing paths:$missing"; fi
 finish
