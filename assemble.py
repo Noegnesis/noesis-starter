@@ -12,7 +12,9 @@ CLI:
       --dest <vault> [--modules modules/] [--execute]
 """
 import argparse
+import datetime
 import re
+import shutil
 import sys
 from pathlib import Path
 
@@ -307,8 +309,62 @@ def _print_plan(plan, dest):
     print(plan["region"])
 
 
-def _apply_plan(plan, dest):  # replaced in the next task
-    raise ModuleError("--execute not implemented yet")
+def upsert_region(existing, region):
+    if existing is None:
+        return region + "\n", "created"
+    if MARK_START in existing and MARK_END in existing:
+        head = existing.split(MARK_START, 1)[0]
+        tail = existing.split(MARK_END, 1)[1]
+        return head + region + tail, "replaced"
+    sep = "" if existing.endswith("\n\n") else ("\n" if existing.endswith("\n") else "\n\n")
+    return existing + sep + region + "\n", "appended"
+
+
+def _old_region_titles(existing):
+    if not existing or MARK_START not in existing or MARK_END not in existing:
+        return []
+    region = existing.split(MARK_START, 1)[1].split(MARK_END, 1)[0]
+    return [line[4:].strip() for line in region.splitlines()
+            if line.startswith("### ")]
+
+
+def _apply_plan(plan, dest):
+    dest = Path(dest)
+    dest.mkdir(parents=True, exist_ok=True)
+    for folder in plan["folders"]:
+        (dest / folder).mkdir(parents=True, exist_ok=True)
+        print(f"folder: {folder}")
+    for seed in plan["seeds"]:
+        target = dest / seed["path"]
+        if target.exists():
+            print(f"seed: {seed['path']} — skip (exists)")
+            continue
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(seed["content"] + "\n", encoding="utf-8")
+        print(f"seed: {seed['path']} — written")
+    repo_root = Path(__file__).resolve().parent
+    for copy in plan["copies"]:
+        target = dest / copy["dest"]
+        if target.exists():
+            print(f"copy: {copy['dest']} — skip (exists)")
+            continue
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(repo_root / copy["src"], target)
+        print(f"copy: {copy['src']} -> {copy['dest']}")
+    claude = dest / "CLAUDE.md"
+    existing = claude.read_text(encoding="utf-8") if claude.exists() else None
+    new_titles = {line[4:].strip() for line in plan["region"].splitlines()
+                  if line.startswith("### ")}
+    for title in _old_region_titles(existing):
+        if title not in new_titles:
+            print(f"orphaned: {title} (folders left in place)")
+    if existing is not None:
+        stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        shutil.copyfile(claude, dest / f"CLAUDE.md.bak.{stamp}")
+    new_text, action = upsert_region(existing, plan["region"])
+    claude.write_text(new_text, encoding="utf-8")
+    print(f"CLAUDE.md region: {action}")
+    return 0
 
 
 def main(argv=None):

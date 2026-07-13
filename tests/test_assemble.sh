@@ -129,5 +129,71 @@ EOF
   miss="$("$PY" "$ASM" --select people --answers "$TMP/answers.yaml" --dest "$TMP/vault1" 2>&1)"; mrc=$?
   assert_eq "$mrc" "0" "people renders via default (exit 0)"
   assert_contains "$miss" "contact info and last conversation" "question defaults render in the plan"
+
+  # --- execute: builds folders + seeds + region; never overwrites; idempotent ---
+  V2="$TMP/vault2"; mkdir -p "$V2"
+  printf '# My Vault\n\nuser content stays.\n' > "$V2/CLAUDE.md"
+  "$PY" "$ASM" --select daily,people --answers "$TMP/answers.yaml" --dest "$V2" --execute >/dev/null
+  assert_eq "$([ -d "$V2/inbox" ] && [ -d "$V2/daily" ] && [ -d "$V2/people" ] && echo yes)" "yes" "execute creates dependency + selected folders"
+  assert_file_exists "$V2/people/People.md" "execute writes the seed file"
+  seedtxt="$(cat "$V2/people/People.md")"
+  assert_contains "$seedtxt" "contact info and last conversation" "seed content renders defaults"
+  cl1="$(cat "$V2/CLAUDE.md")"
+  assert_contains "$cl1" "user content stays." "user CLAUDE.md content preserved"
+  assert_contains "$cl1" "noesis:modules:start" "managed region appended"
+  assert_contains "$cl1" "cadence: daily" "region renders the answers"
+  assert_eq "$(ls "$V2" | grep -c 'CLAUDE.md.bak')" "1" "existing CLAUDE.md backed up"
+
+  # never-overwrite: user edits a seed; re-run must not clobber it
+  printf 'MINE\n' > "$V2/people/People.md"
+  rerun="$("$PY" "$ASM" --select daily,people --answers "$TMP/answers.yaml" --dest "$V2" --execute)"
+  assert_contains "$rerun" "skip (exists)" "re-run reports skipped seeds"
+  assert_eq "$(cat "$V2/people/People.md")" "MINE" "re-run never overwrites user files"
+  cl2="$(sed -n '/noesis:modules:start/,/noesis:modules:end/p' "$V2/CLAUDE.md")"
+  cl1r="$(printf '%s' "$cl1" | sed -n '/noesis:modules:start/,/noesis:modules:end/p')"
+  assert_eq "$cl2" "$cl1r" "re-run leaves the managed region byte-identical"
+
+  # region replacement: narrower selection replaces region + reports orphans
+  orph="$("$PY" "$ASM" --select daily --answers "$TMP/answers.yaml" --dest "$V2" --execute)"
+  assert_contains "$orph" "orphaned: People" "dropped modules reported as orphaned"
+  cl3="$(cat "$V2/CLAUDE.md")"
+  assert_not_contains "$(printf '%s' "$cl3" | sed -n '/noesis:modules:start/,/noesis:modules:end/p')" "### People" "dropped module leaves the region"
+  assert_eq "$([ -d "$V2/people" ] && echo yes)" "yes" "orphaned folders are left in place"
+
+  # payload copies: fixture module with a Files section, incl. dest mapping
+  mkdir -p "$TMP/paymods"
+  cp "$ROOT/modules/inbox.md" "$TMP/paymods/inbox.md"
+  cat > "$TMP/paymods/payload.md" <<'EOF'
+---
+id: payload
+tier: persona
+title: Payload Fixture
+depends_on: []
+suggests: []
+default: false
+---
+
+## Concept
+x
+
+## Applies when
+x
+
+## Questions
+
+## Creates
+- payloaddir/
+
+## CLAUDE.md snippet
+```
+- payload module installed.
+```
+
+## Files
+- `requirements.txt` → `payloaddir/requirements.txt`
+EOF
+  V3="$TMP/vault3"; mkdir -p "$V3"
+  "$PY" "$ASM" --modules "$TMP/paymods" --select payload --answers "$TMP/answers.yaml" --dest "$V3" --execute >/dev/null
+  assert_file_exists "$V3/payloaddir/requirements.txt" "payload copies land at the mapped dest"
 fi
 finish
