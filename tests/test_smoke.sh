@@ -11,4 +11,9 @@ assert_contains "$body" "Create a new vault" "setup.sh offers creating a new vau
 assert_contains "$body" "open_vault_in_obsidian" "setup.sh registers and opens the vault"
 assert_contains "$body" "scripts/obsidian_vault.py" "setup.sh ships obsidian_vault.py into the vault"
 
+assert_not_contains "$body" "second brain is ready" "setup.sh never declares success before the interview"
+assert_contains "$body" "NOESIS_NO_HANDOFF" "setup.sh's handoff is suppressible for tests"
+assert_contains "$body" 'exec claude --model opus' "setup.sh execs into the interview on opus"
+assert_contains "$body" "not personalized yet" "setup.sh says what is actually true at handoff"
+
 finish

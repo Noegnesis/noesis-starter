@@ -543,42 +543,18 @@ echo ""
 echo -e "  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-# ─── DONE ────────────────────────────────────────────────────────────────────
-if [ "$IS_EXISTING_VAULT" = true ]; then
-  echo -e "  ${GREEN}✅ Your vault is upgraded.${RESET}"
-  echo ""
-  echo -e "  ${WHITE}What you just got:${RESET}"
-  echo -e "  - 8 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health /jobs /jobs-setup"
-  if [ "$HAS_EXISTING_CLAUDE" = true ]; then
-    echo -e "  - New CLAUDE.md template (your original backed up as $BACKUP_NAME)"
-  else
-    echo -e "  - CLAUDE.md template (personalize with /vault-setup)"
-  fi
-  echo -e "  - Missing vault folders added (your existing notes untouched)"
-  echo -e "  - File processing scripts in scripts/"
-else
-  echo -e "  ${GREEN}✅ Your second brain is ready.${RESET}"
-  echo ""
-  echo -e "  ${WHITE}What you just got:${RESET}"
-  echo -e "  - 8 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health /jobs /jobs-setup"
-  echo -e "  - CLAUDE.md template (personalize it with /vault-setup)"
-  echo -e "  - Vault folder structure for organizing your notes"
-  echo -e "  - File processing scripts (optional, needs Gemini API key)"
-fi
+# ─── STEP 7/7: hand off into the interview ──────────────────────────────────
 echo ""
-echo -e "  Claude Code now knows your vault structure and will read it before every session."
+if [ "$IS_EXISTING_VAULT" = true ]; then
+  echo -e "  ${GREEN}✓ Noesis added to your vault — not personalized yet.${RESET}"
+else
+  echo -e "  ${GREEN}✓ Vault created — not personalized yet.${RESET}"
+fi
 echo ""
 echo -e "  ${WHITE}Vault:${RESET} $VAULT_PATH"
 echo ""
-echo -e "  ${WHITE}Next steps:${RESET}"
-echo -e "  ${CYAN}1.${RESET} Open Obsidian → open vault → ${DIM}$VAULT_PATH${RESET}"
-echo -e "  ${CYAN}2.${RESET} In Obsidian: gear icon (bottom-left) → General → Enable CLI"
-echo -e "  ${CYAN}3.${RESET} In a new terminal:"
-echo -e "     ${DIM}cd \"$VAULT_PATH\" && claude${RESET}"
-echo -e "  ${CYAN}4.${RESET} Type ${DIM}/vault-setup${RESET} — Claude will interview you and personalize your vault"
-echo ""
-echo -e "  ${DIM}This script is safe to re-run — it detects existing vaults, creates"
-echo -e "  timestamped backups of CLAUDE.md, and only adds what is missing.${RESET}"
+echo -e "  One manual step, once: in Obsidian, gear icon (bottom-left)"
+echo -e "  → General → Enable Command Line Interface."
 echo ""
 
 # A running Obsidian holds the vault registry in memory and rewrites it on quit,
@@ -596,5 +572,46 @@ if [ -n "$PY_BIN" ] && "$PY_BIN" "$SCRIPT_DIR/scripts/obsidian_vault.py" --check
   echo ""
 fi
 
-# Open Obsidian
+# Register the vault and open it. Prints the manual fallback either way.
 open_vault_in_obsidian "$VAULT_PATH"
+
+echo ""
+echo -e "  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo -e "  ${WHITE}Now Claude will make this vault yours.${RESET}"
+echo ""
+echo -e "  It will ask who you are and what you want this for, then write the"
+echo -e "  CLAUDE.md that every future session reads. Takes about five minutes."
+echo ""
+echo -e "  ${DIM}Launching on Opus — this interview is the one place model quality"
+echo -e "  really shows, because everything downstream reads what it writes."
+echo -e "  Prefer your default? Ctrl-C, then: cd \"$VAULT_PATH\" && claude \"/vault-setup\"${RESET}"
+echo ""
+
+if [ -n "${NOESIS_NO_HANDOFF:-}" ]; then
+  echo -e "  ${DIM}[NOESIS_NO_HANDOFF set — skipping handoff]${RESET}"
+  exit 0
+fi
+
+# A fresh install lands claude in ~/.local/bin, which this shell may not have
+# picked up yet. Re-resolve before giving up.
+if ! command -v claude >/dev/null 2>&1; then
+  for d in "$HOME/.local/bin" "$HOME/.claude/bin" "$HOME/bin"; do
+    if [ -x "$d/claude" ]; then PATH="$d:$PATH"; export PATH; break; fi
+  done
+fi
+
+if command -v claude >/dev/null 2>&1; then
+  cd "$VAULT_PATH" || exit 1
+  exec claude --model opus "/vault-setup"
+fi
+
+# Clause 4: cannot launch it for her -- name the exact recovery.
+echo -e "  ${ORANGE}!${RESET}  'claude' isn't on this terminal's PATH yet (normal right after install)."
+echo ""
+echo -e "  ${WHITE}Open a NEW terminal and paste this:${RESET}"
+echo ""
+echo -e "     ${CYAN}cd \"$VAULT_PATH\" && claude --model opus \"/vault-setup\"${RESET}"
+echo ""
+echo -e "  ${DIM}That is the last step — the interview personalizes your vault.${RESET}"
+echo ""
