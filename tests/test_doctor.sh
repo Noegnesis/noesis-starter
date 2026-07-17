@@ -23,5 +23,9 @@ assert_contains "$body" "obsidian.json" "doctor reports where the vault registry
 # nothing compares them. So compare them.
 ps_body="$(cat "$ROOT/lib/doctor.ps1")"
 assert_contains "$ps_body" "obsidian.json" "doctor.ps1 reports the registry too (parity with doctor.sh)"
-assert_contains "$ps_body" "'py'" "doctor.ps1 resolves the py launcher, like setup.ps1 does"
+# Anchor to the ARRAY LITERAL, not the bare token 'py'. The explanatory comment
+# above the code also contains "'py'", so the old assertion passed even with the
+# array reverted -- a reviewer reproduced exactly that. assert_contains is a
+# whole-file substring match; give it something only the real code satisfies.
+assert_contains "$ps_body" "@('python3', 'python', 'py')" "doctor.ps1 resolves the py launcher, like setup.ps1 does"
 finish

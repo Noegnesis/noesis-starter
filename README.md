@@ -5,7 +5,7 @@ Stand up your own second brain — an Obsidian vault guided by Claude Code — i
 ## Quick Start
 
 ### macOS (primary)
-> Note: the macOS installer is in **beta** — verifying on hardware. If anything fails, the script prints the exact command to recover with; nothing is destructive.
+> Note: the macOS installer is in **beta** — verifying on hardware. If anything fails, the script tells you exactly how to finish by hand; nothing is destructive.
 
 ```bash
 git clone https://github.com/Noegnesis/noesis-starter && cd noesis-starter
@@ -35,7 +35,7 @@ without risking your notes, wikilinks, or Claude Code setup. See
 
 ## What gets installed
 
-Obsidian, Claude Code, Python deps (in an isolated venv), and the core skills (`/vault-setup`, `/daily`, `/tldr`, `/file-intel`, `/weekly`, `/vault-health`, `/jobs`, `/jobs-setup`) both in your vault and globally. Setup finds the vaults Obsidian already knows about, or creates and registers a new one, opens it, and then hands you straight to `/vault-setup` — the interview that makes the vault yours. You are not left at a terminal wondering what to type next.
+Obsidian, Claude Code, Python deps (in an isolated venv), and the core skills (`/vault-setup`, `/daily`, `/tldr`, `/file-intel`, `/weekly`, `/vault-health`, `/jobs`, `/jobs-setup`) both in your vault and globally. Setup finds the vaults Obsidian already knows about, or creates and registers a new one, and opens it. Then it launches `/vault-setup` — the interview that makes the vault yours — or, if `claude` isn't on your PATH yet (normal right after it installs), prints the one command to paste into a new terminal. Either way you are told exactly what happens next, rather than being left at a prompt guessing.
 
 ## Going deeper
 
