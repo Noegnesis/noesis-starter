@@ -164,15 +164,53 @@ else
   echo -e "  ${ORANGE}⚠${RESET}  Python 3 not found. Install: brew install python3"
 fi
 
-# ─── STEP 6: Vault setup ─────────────────────────────────────────────────────
+# ─── STEP 5: Vault setup ─────────────────────────────────────────────────────
 echo ""
 echo -e "${WHITE}Step 5/7 — Setting up your vault${RESET}"
 echo ""
-echo -e "  Where should your second brain live?"
-echo -e "  ${DIM}Press Enter for default: ~/noesis-vault${RESET}"
-echo -e "  ${DIM}(e.g. ~/Documents/MyVault or /Users/yourname/Notes)${RESET}"
-read -rp "  Vault path: " VAULT_PATH
-VAULT_PATH="${VAULT_PATH:-$HOME/noesis-vault}"
+
+# Ask Obsidian itself what vaults exist. Empty when Obsidian has never run.
+KNOWN_VAULTS="$(obsidian_list_vaults)"
+VAULT_PATH=""
+
+if [ -n "$KNOWN_VAULTS" ]; then
+  echo -e "  Obsidian already knows about these vaults:"
+  echo ""
+  # Indexed arrays exist in bash 3.2 (only ASSOCIATIVE arrays need bash 4), so
+  # no eval here. The heredoc -- not a pipe -- keeps the loop in this shell, so
+  # the appends survive.
+  VAULT_OPTS=()
+  while IFS= read -r v; do
+    [ -z "$v" ] && continue
+    VAULT_OPTS+=("$v")
+    echo -e "    ${CYAN}${#VAULT_OPTS[@]}.${RESET} $v"
+    echo -e "       ${DIM}add Noesis to it — your notes are not touched${RESET}"
+  done <<EOF
+$KNOWN_VAULTS
+EOF
+  COUNT=${#VAULT_OPTS[@]}
+  NEW_OPT=$((COUNT+1))
+  echo -e "    ${CYAN}$NEW_OPT.${RESET} Create a new vault"
+  echo -e "       ${DIM}a clean start at ~/noesis-vault${RESET}"
+  echo ""
+  read -rp "  Which one? [$NEW_OPT]: " VAULT_CHOICE
+  VAULT_CHOICE="${VAULT_CHOICE:-$NEW_OPT}"
+  # Non-numeric input fails these tests and falls through to the prompt below.
+  # Inside an `if` condition, so `set -e` never fires on the comparison.
+  if [ "$VAULT_CHOICE" -ge 1 ] 2>/dev/null && [ "$VAULT_CHOICE" -le "$COUNT" ] 2>/dev/null; then
+    VAULT_PATH="${VAULT_OPTS[$((VAULT_CHOICE-1))]}"
+    echo -e "  ${GREEN}✓${RESET} Using $VAULT_PATH"
+  fi
+fi
+
+if [ -z "$VAULT_PATH" ]; then
+  echo ""
+  echo -e "  Where should your second brain live?"
+  echo -e "  ${DIM}Press Enter for default: ~/noesis-vault${RESET}"
+  echo -e "  ${DIM}(e.g. ~/Documents/MyVault or /Users/yourname/Notes)${RESET}"
+  read -rp "  Vault path: " VAULT_PATH
+  VAULT_PATH="${VAULT_PATH:-$HOME/noesis-vault}"
+fi
 VAULT_PATH="${VAULT_PATH/#\~/$HOME}"
 
 # Strip trailing slash (unless it's root /)
@@ -255,6 +293,17 @@ if [ "$HAS_OBSIDIAN_FOLDER" = true ] || [ "$IS_NON_EMPTY" = true ]; then
   fi
 fi
 
+# Obsidian holds the registry in memory and rewrites it on quit, which would
+# silently undo our registration. Ask first -- a named action, not a dead end.
+PY_BIN="$(noesis_python)"
+if [ -n "$PY_BIN" ] && "$PY_BIN" "$SCRIPT_DIR/scripts/obsidian_vault.py" --check-running >/dev/null 2>&1; then
+  echo ""
+  echo -e "  ${ORANGE}!${RESET}  Obsidian is running. It rewrites its vault list when it quits,"
+  echo -e "     which would undo the registration I'm about to do."
+  echo -e "     ${WHITE}Quit Obsidian, then press Enter.${RESET}"
+  read -rp "  " _
+fi
+
 mkdir -p "$VAULT_PATH"/{inbox,daily,projects,research,archive,scripts,.claude/skills/vault-setup,.claude/skills/daily,.claude/skills/tldr,.claude/skills/file-intel,.claude/skills/weekly,.claude/skills/vault-health,.claude/skills/jobs,.claude/skills/jobs-setup}
 
 # Copy core files using safe_cp (won't crash if source is missing)
@@ -279,6 +328,7 @@ safe_cp "$SCRIPT_DIR/skills/jobs-setup/SKILL.md"   "$VAULT_PATH/.claude/skills/j
 safe_cp "$SCRIPT_DIR/scripts/process_docs_to_obsidian.py" "$VAULT_PATH/scripts/process_docs_to_obsidian.py"
 safe_cp "$SCRIPT_DIR/scripts/process_files_with_gemini.py" "$VAULT_PATH/scripts/process_files_with_gemini.py"
 safe_cp "$SCRIPT_DIR/scripts/vault_health.py" "$VAULT_PATH/scripts/vault_health.py"
+safe_cp "$SCRIPT_DIR/scripts/obsidian_vault.py" "$VAULT_PATH/scripts/obsidian_vault.py"
 mkdir -p "$VAULT_PATH/scripts/jobs/templates"
 safe_cp "$SCRIPT_DIR/scripts/jobs/jobslib.py"           "$VAULT_PATH/scripts/jobs/jobslib.py"
 safe_cp "$SCRIPT_DIR/scripts/jobs/scaffold.py"          "$VAULT_PATH/scripts/jobs/scaffold.py"
