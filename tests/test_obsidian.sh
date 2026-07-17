@@ -129,9 +129,9 @@ else
   # --- open prints the path AS PASSED, never normalized (Windows would differ) ---
   # Same MSYS boundary as above -- the leaf filename component ("my vault", with
   # its space) survives the rewrite, so check for that rather than the full
-  # "/tmp/..." prefix. The bottom-of-file assertion (calling open_vault_in_obsidian
-  # directly, no python/MSYS argv boundary) is what proves the un-normalized-path
-  # behavior end to end.
+  # "/tmp/..." prefix. (The bottom-of-file assertion covers the same "raw path,
+  # never normalized" design contract for lib/obsidian.sh's pre-existing bash
+  # helper, which has no python/MSYS argv boundary to cross.)
   out="$("$PY" "$OV" --open "/tmp/my vault" --registry "$TMP/open.json" --dry-run 2>&1)"
   assert_contains "$out" "Open folder as vault ->" "--open echoes the fallback marker"
   assert_contains "$out" "my vault" "--open echoes the raw filename component, unmangled"
