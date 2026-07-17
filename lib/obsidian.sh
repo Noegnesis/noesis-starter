@@ -20,18 +20,21 @@ obsidian_list_vaults() {
   fi
 }
 
-# obsidian_open_vault PATH -> register PATH, then launch Obsidian into it
+# open_vault_in_obsidian PATH -> register PATH, then launch Obsidian into it
 open_vault_in_obsidian() {
   vault_path="$1"
   py="$(noesis_python)"
   if [ -n "$py" ] && [ -f "$NOESIS_OBSIDIAN_PY" ]; then
-    # Must be an `if` condition, not `cmd && return 0`: setup.sh runs under
-    # `set -e`, where a trailing failed &&-list would abort the installer.
-    if "$py" "$NOESIS_OBSIDIAN_PY" --open "$vault_path"; then
-      return 0
-    fi
+    # The module prints the fallback itself on BOTH success and failure, so once
+    # we have delegated, our own copy would double it -- and on Git Bash the two
+    # copies disagree, because MSYS rewrites the path the module receives.
+    # `|| true` + an unconditional `return 0`: setup.sh sources this under
+    # `set -e`, where a failing tail command would abort the whole installer.
+    "$py" "$NOESIS_OBSIDIAN_PY" --open "$vault_path" || true
+    return 0
   fi
-  # No Python, or registration failed: the manual step always works.
+  # Delegation was impossible (no Python, or the module is missing). This echo
+  # is the no-Python floor -- the one copy of the string that cannot delegate.
   echo "If Obsidian did not open automatically:"
   echo "  Obsidian -> Open folder as vault -> $vault_path"
   return 0

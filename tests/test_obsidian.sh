@@ -163,6 +163,13 @@ else
   assert_contains "$out" "Open folder as vault -> /tmp/my vault" "fallback prints even without python"
 fi
 
+# This runs with OR without python. With python it delegates, and the module
+# echoes the path IT received -- which MSYS has rewritten under Git Bash -- so
+# assert the marker and the leaf, not the spelling. The exactly-once check is
+# the real guard: bash must NOT add its own copy on top of the module's.
 out="$(open_vault_in_obsidian "/tmp/my vault" 2>&1)"
-assert_contains "$out" "Open folder as vault -> /tmp/my vault" "always prints manual fallback with the path"
+assert_contains "$out" "Open folder as vault ->" "always prints the manual fallback"
+assert_contains "$out" "my vault" "the fallback names the vault"
+count="$(printf '%s\n' "$out" | grep -c "Open folder as vault ->")"
+assert_eq "$count" "1" "the fallback prints exactly once, never doubled"
 finish
