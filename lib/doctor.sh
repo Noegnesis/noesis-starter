@@ -19,7 +19,14 @@ run_doctor() {
     echo "  WARN Obsidian not detected (macOS: brew install --cask obsidian)"
   fi
   # Advisory, never counted: absent just means Obsidian has not launched yet.
-  py="$(command -v python3 2>/dev/null || command -v python 2>/dev/null || true)"
+  # Use the probed resolver when it's loaded (setup.sh sources both libs) --
+  # presence is not proof it runs. Fall back to a bare lookup when doctor.sh is
+  # sourced on its own.
+  if command -v noesis_python >/dev/null 2>&1; then
+    py="$(noesis_python)"
+  else
+    py="$(command -v python3 2>/dev/null || command -v python 2>/dev/null || true)"
+  fi
   ov="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts/obsidian_vault.py"
   if [ -n "$py" ] && [ -f "$ov" ]; then
     reg="$("$py" "$ov" --registry-path 2>/dev/null || true)"

@@ -15,9 +15,15 @@ function Invoke-Doctor {
     # false "OK python (python3.exe)" on a Python-less Windows box.
     $ovPy = $null
     foreach ($c in @('python3', 'python', 'py')) {
-        $cand = Get-Command $c -ErrorAction SilentlyContinue
+        # -CommandType Application excludes aliases/functions from a user profile,
+        # whose .Source is empty -- `& '' -c ...` never launches, so it raises a
+        # non-terminating error and leaves $LASTEXITCODE untouched, letting an
+        # earlier winget/pip call's 0 pass a bogus candidate.
+        $cand = Get-Command $c -CommandType Application -ErrorAction SilentlyContinue
         if ($cand) {
-            & $cand.Source -c "pass" 2>$null | Out-Null
+            # Probe the module's real contract (secrets, Python 3.6+), not
+            # merely that the interpreter starts -- obsidian_vault.py imports it.
+            & $cand.Source -c "import secrets" 2>$null | Out-Null
             if ($LASTEXITCODE -eq 0) { $ovPy = $cand; break }
         }
     }

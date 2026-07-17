@@ -28,4 +28,5 @@ assert_contains "$ps_body" "obsidian.json" "doctor.ps1 reports the registry too 
 # array reverted -- a reviewer reproduced exactly that. assert_contains is a
 # whole-file substring match; give it something only the real code satisfies.
 assert_contains "$ps_body" "@('python3', 'python', 'py')" "doctor.ps1 resolves the py launcher, like setup.ps1 does"
+assert_contains "$body" "noesis_python" "doctor.sh uses the probed resolver, not a bare lookup"
 finish

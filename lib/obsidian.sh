@@ -11,10 +11,13 @@ NOESIS_OBSIDIAN_PY="${NOESIS_OBSIDIAN_PY:-$_obsidian_lib_dir/../scripts/obsidian
 # App Execution Alias stubs for python3/python that resolve on PATH, open the
 # Microsoft Store, and exit 9009 -- and a broken interpreter resolves fine too.
 # Callers treat empty output as "no python" and fall back to the manual path.
+# The probe asserts the module's real contract (obsidian_vault.py imports
+# `secrets`, Python 3.6+), not merely that an interpreter starts -- a Python 2
+# or <=3.5 interpreter would pass "-c pass" and then die on the import.
 noesis_python() {
   for _c in python3 python; do
     _p="$(command -v "$_c" 2>/dev/null || true)"
-    if [ -n "$_p" ] && "$_p" -c "pass" >/dev/null 2>&1; then
+    if [ -n "$_p" ] && "$_p" -c "import secrets" >/dev/null 2>&1; then
       echo "$_p"
       return 0
     fi

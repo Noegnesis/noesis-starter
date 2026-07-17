@@ -173,6 +173,14 @@ else
   assert_eq "$out" "" "noesis_python rejects an interpreter that resolves but exits nonzero"
   out="$(PATH="$TMP/fakebin" open_vault_in_obsidian "/tmp/my vault" 2>&1)"
   assert_contains "$out" "Open folder as vault -> /tmp/my vault" "a broken interpreter still yields the manual fallback"
+
+  # --- an interpreter that STARTS but can't import what the module needs ---
+  # -c "pass" would accept a Python 2 / <=3.5 here; the module needs secrets.
+  mkdir -p "$TMP/oldpy"
+  printf '#!/bin/sh\nif [ "$1" = "-c" ]; then case "$2" in *secrets*) exit 1;; *) exit 0;; esac; fi\nexit 0\n' > "$TMP/oldpy/python3"
+  chmod +x "$TMP/oldpy/python3"
+  out="$(PATH="$TMP/oldpy" noesis_python 2>&1)"
+  assert_eq "$out" "" "noesis_python rejects an interpreter that cannot import secrets"
 fi
 
 # This runs with OR without python. With python it delegates, and the module
