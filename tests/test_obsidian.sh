@@ -134,7 +134,7 @@ else
   # helper, which has no python/MSYS argv boundary to cross.)
   out="$("$PY" "$OV" --open "/tmp/my vault" --registry "$TMP/open.json" --dry-run 2>&1)"
   assert_contains "$out" "Open folder as vault ->" "--open echoes the fallback marker"
-  assert_contains "$out" "my vault" "--open echoes the raw filename component, unmangled"
+  assert_contains "$out" "my vault" "--open's fallback preserves an embedded space in the path"
 
   # --- a failed registration still tells the user what to do by hand ---
   out="$("$PY" "$OV" --open "$TMP/nonexistent-dir" --registry "$TMP/open.json" --dry-run 2>&1)"; rc=$?
@@ -142,11 +142,16 @@ else
   assert_contains "$out" "Open folder as vault" "--open still prints the fallback when registration fails"
 
   # --- check-running answers without throwing ---
-  "$PY" "$OV" --check-running >/dev/null 2>&1; rc=$?
+  # Capture stderr rather than discarding it. An uncaught exception exits 1 too,
+  # which the exit-code check ALONE cannot tell apart from an honest "not
+  # running" -- so a full regression of obsidian_running()'s try/except would
+  # still show green. The Traceback assertion is what actually guards it.
+  out="$("$PY" "$OV" --check-running 2>&1)"; rc=$?
   case "$rc" in
     0|1) pass "--check-running exits 0 or 1";;
     *)   fail "--check-running exits 0 or 1 (got $rc)";;
   esac
+  assert_not_contains "$out" "Traceback" "--check-running never throws"
 fi
 
 out="$(open_vault_in_obsidian "/tmp/my vault" 2>&1)"
