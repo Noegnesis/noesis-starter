@@ -673,6 +673,21 @@ Write-Host "  One manual step, once: in Obsidian, gear icon (bottom-left)"
 Write-Host "  -> General -> Enable Command Line Interface."
 Write-Host ""
 
+# A running Obsidian holds the vault registry in memory and rewrites it on quit,
+# which would silently undo the registration below -- and a launch would no-op
+# against the already-running app, so the vault would never open. This MUST sit
+# adjacent to the write, for the same reason it does in setup.sh.
+if ($pyBin) {
+    & $pyBin $ovModule --check-running 2>$null | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "  ${Orange}!${Reset}  Obsidian is running. It rewrites its vault list when it quits,"
+        Write-Host "     which would undo the registration I'm about to do."
+        Write-Host "     ${White}Quit Obsidian, then press Enter.${Reset}"
+        Read-Host | Out-Null
+        Write-Host ""
+    }
+}
+
 if ($pyBin) {
     & $pyBin $ovModule --open $vaultPath
 } else {

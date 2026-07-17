@@ -35,4 +35,10 @@ assert_not_contains "$ps" "second brain is ready" "setup.ps1 never declares succ
 assert_contains "$ps" "NOESIS_NO_HANDOFF" "setup.ps1's handoff is suppressible for tests"
 assert_contains "$ps" "not personalized yet" "setup.ps1 says what is actually true at handoff"
 
+# Parity guard. This exact gap shipped once: setup.sh got the running-Obsidian
+# check and setup.ps1 silently didn't, while the plan claimed parity. The two
+# installers drift precisely because nothing compares them -- so compare them.
+assert_eq "$(grep -c 'check-running' "$ROOT/setup.sh")" "1" "setup.sh guards against a running Obsidian"
+assert_eq "$(grep -c 'check-running' "$ROOT/setup.ps1")" "1" "setup.ps1 guards against a running Obsidian"
+
 finish
