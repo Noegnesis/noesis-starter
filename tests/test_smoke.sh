@@ -16,4 +16,16 @@ assert_contains "$body" "NOESIS_NO_HANDOFF" "setup.sh's handoff is suppressible 
 assert_contains "$body" 'exec claude --model opus' "setup.sh execs into the interview on opus"
 assert_contains "$body" "not personalized yet" "setup.sh says what is actually true at handoff"
 
+# The suppression gate is only real if it comes BEFORE the exec. A mere
+# assert_contains proves the string exists somewhere -- a regression that moved
+# the gate below `exec claude` would be dead code on every machine with claude
+# on PATH, and every assertion above would still pass. Check the order.
+nh_line="$(grep -n 'NOESIS_NO_HANDOFF' "$ROOT/setup.sh" | head -1 | cut -d: -f1)"
+ex_line="$(grep -n 'exec claude' "$ROOT/setup.sh" | head -1 | cut -d: -f1)"
+if [ -n "$nh_line" ] && [ -n "$ex_line" ] && [ "$nh_line" -lt "$ex_line" ]; then
+  pass "the NOESIS_NO_HANDOFF gate precedes the exec"
+else
+  fail "the NOESIS_NO_HANDOFF gate precedes the exec (gate line '$nh_line', exec line '$ex_line')"
+fi
+
 finish

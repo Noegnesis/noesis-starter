@@ -543,7 +543,7 @@ echo ""
 echo -e "  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-# ─── STEP 7/7: hand off into the interview ──────────────────────────────────
+# ─── HAND OFF TO THE INTERVIEW ──────────────────────────────────────────────
 echo ""
 if [ "$IS_EXISTING_VAULT" = true ]; then
   echo -e "  ${GREEN}✓ Noesis added to your vault — not personalized yet.${RESET}"
