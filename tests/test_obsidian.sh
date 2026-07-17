@@ -152,6 +152,15 @@ else
     *)   fail "--check-running exits 0 or 1 (got $rc)";;
   esac
   assert_not_contains "$out" "Traceback" "--check-running never throws"
+
+  # --- lib wrapper delegates and lists ---
+  out="$(obsidian_list_vaults "$FIX/registry-two-vaults.json" 2>&1)"
+  assert_contains "$out" "/tmp/noesis-fixture-alpha" "obsidian_list_vaults surfaces registered vaults"
+
+  # --- the wrapper degrades to the manual path when python is absent ---
+  out="$(PATH=/nonexistent open_vault_in_obsidian "/tmp/my vault" 2>&1)"; rc=$?
+  assert_eq "$rc" "0" "open_vault_in_obsidian returns 0 without python"
+  assert_contains "$out" "Open folder as vault -> /tmp/my vault" "fallback prints even without python"
 fi
 
 out="$(open_vault_in_obsidian "/tmp/my vault" 2>&1)"
