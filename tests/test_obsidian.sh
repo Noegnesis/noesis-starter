@@ -110,6 +110,43 @@ else
   # --- register rejects a path that is not a directory ---
   out="$("$PY" "$OV" --register "$TMP/does-not-exist" --registry "$reg" 2>&1)"; rc=$?
   assert_eq "$rc" "1" "register rejects a non-directory path"
+
+  # --- open: registers, then reports the launch it would make ---
+  # Do NOT assert the full string "Open folder as vault -> $TMP/openable": under
+  # Git Bash, MSYS rewrites a POSIX path argument to a native Windows one before
+  # it reaches a non-MSYS python (drive/separator syntax changes, filename
+  # component does not -- same hazard as the --registry override note above).
+  # Assert the fallback marker and the untouched filename component instead.
+  mkdir -p "$TMP/openable"
+  out="$("$PY" "$OV" --open "$TMP/openable" --registry "$TMP/open.json" --dry-run 2>&1)"; rc=$?
+  assert_eq "$rc" "0" "--open --dry-run exits 0"
+  assert_contains "$out" "would launch:" "--dry-run reports the launch instead of running it"
+  assert_contains "$out" "Open folder as vault ->" "--open prints the manual fallback marker"
+  assert_contains "$out" "openable" "--open's fallback names the target vault"
+  out="$("$PY" "$OV" --list --registry "$TMP/open.json" 2>&1)"
+  assert_contains "$out" "openable" "--open registers the vault before launching"
+
+  # --- open prints the path AS PASSED, never normalized (Windows would differ) ---
+  # Same MSYS boundary as above -- the leaf filename component ("my vault", with
+  # its space) survives the rewrite, so check for that rather than the full
+  # "/tmp/..." prefix. The bottom-of-file assertion (calling open_vault_in_obsidian
+  # directly, no python/MSYS argv boundary) is what proves the un-normalized-path
+  # behavior end to end.
+  out="$("$PY" "$OV" --open "/tmp/my vault" --registry "$TMP/open.json" --dry-run 2>&1)"
+  assert_contains "$out" "Open folder as vault ->" "--open echoes the fallback marker"
+  assert_contains "$out" "my vault" "--open echoes the raw filename component, unmangled"
+
+  # --- a failed registration still tells the user what to do by hand ---
+  out="$("$PY" "$OV" --open "$TMP/nonexistent-dir" --registry "$TMP/open.json" --dry-run 2>&1)"; rc=$?
+  assert_eq "$rc" "1" "--open on a bad path exits 1"
+  assert_contains "$out" "Open folder as vault" "--open still prints the fallback when registration fails"
+
+  # --- check-running answers without throwing ---
+  "$PY" "$OV" --check-running >/dev/null 2>&1; rc=$?
+  case "$rc" in
+    0|1) pass "--check-running exits 0 or 1";;
+    *)   fail "--check-running exits 0 or 1 (got $rc)";;
+  esac
 fi
 
 out="$(open_vault_in_obsidian "/tmp/my vault" 2>&1)"

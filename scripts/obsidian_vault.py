@@ -164,6 +164,55 @@ def cmd_register(args):
     return 0
 
 
+def obsidian_running():
+    system = platform.system()
+    try:
+        if system == "Windows":
+            out = subprocess.run(
+                ["tasklist", "/FI", "IMAGENAME eq Obsidian.exe"],
+                stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+            return b"Obsidian.exe" in (out.stdout or b"")
+        name = "Obsidian" if system == "Darwin" else "obsidian"
+        out = subprocess.run(["pgrep", "-x", name],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return out.returncode == 0
+    except (OSError, ValueError):
+        return False   # cannot tell -> assume not running; the fallback covers us
+
+
+def launch_cmd():
+    """Launch Obsidian. No path: register() set open:true on the target vault."""
+    system = platform.system()
+    if system == "Darwin":
+        return ["open", "-a", "Obsidian"]
+    if system == "Windows":
+        return ["cmd", "/c", "start", "", "obsidian://"]
+    return ["xdg-open", "obsidian://"]
+
+
+def cmd_open(args):
+    path = registry_path(args.registry)
+    rc = 0
+    try:
+        register(args.open, path)
+    except (ValueError, OSError) as exc:
+        sys.stderr.write("error: %s\n" % exc)
+        rc = 1
+    if rc == 0:
+        if args.dry_run:
+            sys.stdout.write("would launch: %s\n" % " ".join(launch_cmd()))
+        else:
+            try:
+                subprocess.Popen(launch_cmd(),
+                                 stdout=subprocess.DEVNULL,
+                                 stderr=subprocess.DEVNULL)
+            except (OSError, ValueError):
+                pass   # the fallback below is the recovery path
+    # Clause 4: every failure path names its recovery. Print the path AS GIVEN.
+    sys.stdout.write("%s\n" % (FALLBACK % args.open))
+    return rc
+
+
 def build_parser():
     p = argparse.ArgumentParser(
         description="Register and open Obsidian vaults via obsidian.json.")
@@ -195,6 +244,10 @@ def main(argv=None):
         return cmd_list(args)
     if args.register:
         return cmd_register(args)
+    if args.check_running:
+        return 0 if obsidian_running() else 1
+    if args.open:
+        return cmd_open(args)
     return 1
 
 
