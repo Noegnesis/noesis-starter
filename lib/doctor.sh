@@ -18,5 +18,16 @@ run_doctor() {
   else
     echo "  WARN Obsidian not detected (macOS: brew install --cask obsidian)"
   fi
+  # Advisory, never counted: absent just means Obsidian has not launched yet.
+  py="$(command -v python3 2>/dev/null || command -v python 2>/dev/null || true)"
+  ov="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts/obsidian_vault.py"
+  if [ -n "$py" ] && [ -f "$ov" ]; then
+    reg="$("$py" "$ov" --registry-path 2>/dev/null)"
+    if [ -n "$reg" ] && [ -f "$reg" ]; then
+      echo "  OK   Obsidian vault registry ($reg)"
+    else
+      echo "  WARN No obsidian.json yet — setup will create it (normal before Obsidian's first launch)"
+    fi
+  fi
   return "$missing"
 }

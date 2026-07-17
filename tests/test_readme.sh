@@ -13,4 +13,6 @@ body="$(cat "$ROOT/README.md")"
 assert_contains "$body" "Kashef" "credits Kashef / Prompt Advisers for installer prior-art"
 assert_contains "$body" "beta" "macOS path is labeled beta until hardware-verified"
 assert_contains "$body" "docs/README.md" "README routes readers to the guide front door"
+assert_contains "$body" "/vault-setup" "README names the interview"
+assert_not_contains "$body" "Type /vault-setup" "README no longer frames the interview as a manual step"
 finish
