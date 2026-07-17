@@ -220,8 +220,14 @@ Write-Host ""
 Write-Host "${White}Step 5/7 -- Setting up your vault${Reset}"
 Write-Host ""
 
+# 'py' (the Windows launcher) is included because setup.ps1's OWN pip step
+# already falls back to it -- a machine where only `py` resolves is a real,
+# supported configuration for this installer. An earlier draft omitted it, which
+# would have silently no-op'd the whole registry feature (discovery, the
+# running-Obsidian guard, and --open) on exactly those machines, degrading them
+# to the manual fallback while claiming Windows parity.
 function Get-NoesisPython {
-    foreach ($c in @('python3', 'python')) {
+    foreach ($c in @('python3', 'python', 'py')) {
         $p = (Get-Command $c -ErrorAction SilentlyContinue)
         if ($p) { return $p.Source }
     }
@@ -267,6 +273,7 @@ if (-not $vaultPath) {
     Write-Host ""
     Write-Host "  Where should your second brain live?"
     Write-Host "  ${Dim}Press Enter for default: $env:USERPROFILE\noesis-vault${Reset}"
+    Write-Host "  ${Dim}(e.g. C:\Users\YourName\Documents\MyVault -- quotes OK)${Reset}"
     $vaultInput = Read-Host "  Vault path"
     if (-not $vaultInput) { $vaultInput = "$env:USERPROFILE\noesis-vault" }
     $vaultPath = $vaultInput.Trim().Trim('"').Trim("'")
@@ -712,7 +719,23 @@ if ($env:NOESIS_NO_HANDOFF) {
 
 $claude = (Get-Command claude -ErrorAction SilentlyContinue)
 if ($claude) {
-    Set-Location $vaultPath
+    # -ErrorAction Stop + try/catch is the PowerShell equivalent of bash's
+    # `cd "$VAULT_PATH" || exit 1`. Without it, a failed Set-Location is
+    # NON-TERMINATING: the script would sail on and launch the interview in
+    # whatever directory it happens to be sitting in -- the installer's own
+    # checkout -- silently personalising the wrong folder. That is precisely the
+    # act-on-the-wrong-target failure this whole plan exists to eliminate.
+    try {
+        Set-Location -LiteralPath $vaultPath -ErrorAction Stop
+    } catch {
+        Write-Host "  ${Orange}!${Reset}  Couldn't open $vaultPath."
+        Write-Host ""
+        Write-Host "  ${White}Open a NEW PowerShell window and paste this:${Reset}"
+        Write-Host ""
+        Write-Host "     ${Cyan}cd `"$vaultPath`"; claude --model opus `"/vault-setup`"${Reset}"
+        Write-Host ""
+        exit 1
+    }
     & claude --model opus "/vault-setup"
 } else {
     Write-Host "  ${Orange}!${Reset}  'claude' isn't on this terminal's PATH yet (normal right after install)."
