@@ -28,4 +28,11 @@ else
   fail "the NOESIS_NO_HANDOFF gate precedes the exec (gate line '$nh_line', exec line '$ex_line')"
 fi
 
+ps="$(cat "$ROOT/setup.ps1")"
+assert_contains "$ps" "obsidian_vault.py" "setup.ps1 uses the shared registry module"
+assert_not_contains "$ps" 'Start-Process "obsidian://"' "setup.ps1 no longer blind-launches Obsidian"
+assert_not_contains "$ps" "second brain is ready" "setup.ps1 never declares success before the interview"
+assert_contains "$ps" "NOESIS_NO_HANDOFF" "setup.ps1's handoff is suppressible for tests"
+assert_contains "$ps" "not personalized yet" "setup.ps1 says what is actually true at handoff"
+
 finish

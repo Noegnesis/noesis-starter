@@ -219,17 +219,62 @@ if (-not $pipInstalled) {
 Write-Host ""
 Write-Host "${White}Step 5/7 -- Setting up your vault${Reset}"
 Write-Host ""
-Write-Host "  Where should your second brain live?"
-Write-Host "  ${Dim}Press Enter for default: $env:USERPROFILE\noesis-vault${Reset}"
-Write-Host "  ${Dim}(e.g. C:\Users\YourName\Documents\MyVault -- quotes OK)${Reset}"
-$vaultInput = Read-Host "  Vault path"
-if (-not $vaultInput) { $vaultInput = "$env:USERPROFILE\noesis-vault" }
 
-# Sanitize: strip surrounding quotes, trim whitespace, expand tilde
-$vaultPath = $vaultInput.Trim().Trim('"').Trim("'")
-if ($vaultPath.StartsWith('~')) {
-    $vaultPath = $vaultPath.Replace('~', $env:USERPROFILE)
+function Get-NoesisPython {
+    foreach ($c in @('python3', 'python')) {
+        $p = (Get-Command $c -ErrorAction SilentlyContinue)
+        if ($p) { return $p.Source }
+    }
+    return $null
 }
+
+function Get-KnownVaults {
+    param([string]$Py, [string]$Module)
+    if (-not $Py) { return @() }
+    $out = & $Py $Module --list 2>$null
+    if ($LASTEXITCODE -ne 0) { return @() }
+    return @($out | Where-Object { $_ -and $_.Trim() -ne '' })
+}
+
+$pyBin = Get-NoesisPython
+$ovModule = Join-Path $scriptDir 'scripts\obsidian_vault.py'
+$knownVaults = Get-KnownVaults -Py $pyBin -Module $ovModule
+$vaultPath = ''
+
+if ($knownVaults.Count -gt 0) {
+    Write-Host "  Obsidian already knows about these vaults:"
+    Write-Host ""
+    for ($i = 0; $i -lt $knownVaults.Count; $i++) {
+        Write-Host "    $($i + 1). $($knownVaults[$i])"
+        Write-Host "       ${Dim}add Noesis to it - your notes are not touched${Reset}"
+    }
+    $newOpt = $knownVaults.Count + 1
+    Write-Host "    $newOpt. Create a new vault"
+    Write-Host "       ${Dim}a clean start at $env:USERPROFILE\noesis-vault${Reset}"
+    Write-Host ""
+    $choice = Read-Host "  Which one? [$newOpt]"
+    if (-not $choice) { $choice = "$newOpt" }
+    $n = 0
+    if ([int]::TryParse($choice, [ref]$n)) {
+        if ($n -ge 1 -and $n -le $knownVaults.Count) {
+            $vaultPath = $knownVaults[$n - 1]
+            Write-Host "  ${Green}OK${Reset} Using $vaultPath"
+        }
+    }
+}
+
+if (-not $vaultPath) {
+    Write-Host ""
+    Write-Host "  Where should your second brain live?"
+    Write-Host "  ${Dim}Press Enter for default: $env:USERPROFILE\noesis-vault${Reset}"
+    $vaultInput = Read-Host "  Vault path"
+    if (-not $vaultInput) { $vaultInput = "$env:USERPROFILE\noesis-vault" }
+    $vaultPath = $vaultInput.Trim().Trim('"').Trim("'")
+    if ($vaultPath.StartsWith('~')) {
+        $vaultPath = $vaultPath.Replace('~', $env:USERPROFILE)
+    }
+}
+
 # Strip trailing backslash (unless it's a root like C:\)
 if ($vaultPath.Length -gt 3 -and $vaultPath.EndsWith('\')) {
     $vaultPath = $vaultPath.TrimEnd('\')
@@ -341,6 +386,7 @@ foreach ($script in @("process_docs_to_obsidian.py", "process_files_with_gemini.
         Copy-Item "$scriptDir\scripts\$script" "$vaultPath\scripts\" -Force
     }
 }
+Copy-Item "$scriptDir\scripts\obsidian_vault.py" "$vaultPath\scripts\obsidian_vault.py" -Force -ErrorAction SilentlyContinue
 
 # Copy scripts/jobs/ (config-driven job-pipeline scaffolder)
 New-Item -ItemType Directory -Force -Path "$vaultPath\scripts\jobs\templates" | Out-Null
@@ -614,42 +660,52 @@ Write-Host "  ====================================================="
 Write-Host ""
 
 # Done
+Write-Host ""
 if ($isExistingVault) {
-    Write-Host "  ${Green}Your vault is upgraded.${Reset}"
-    Write-Host ""
-    Write-Host "  ${White}What you just got:${Reset}"
-    Write-Host "  - 8 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health /jobs /jobs-setup"
-    if ($hasExistingClaude) {
-        Write-Host "  - New CLAUDE.md template (your original backed up as $backupName)"
-    } else {
-        Write-Host "  - CLAUDE.md template (personalize with /vault-setup)"
-    }
-    Write-Host "  - Missing vault folders added (your existing notes untouched)"
-    Write-Host "  - File processing scripts in scripts/"
+    Write-Host "  ${Green}Noesis added to your vault - not personalized yet.${Reset}"
 } else {
-    Write-Host "  ${Green}Your second brain is ready.${Reset}"
-    Write-Host ""
-    Write-Host "  ${White}What you just got:${Reset}"
-    Write-Host "  - 8 slash commands: /vault-setup /daily /tldr /file-intel /weekly /vault-health /jobs /jobs-setup"
-    Write-Host "  - CLAUDE.md template (personalize it with /vault-setup)"
-    Write-Host "  - Vault folder structure for organizing your notes"
-    Write-Host "  - File processing scripts (optional, needs Gemini API key)"
+    Write-Host "  ${Green}Vault created - not personalized yet.${Reset}"
 }
 Write-Host ""
-Write-Host "  Claude Code now knows your vault structure and will read it before every session."
+Write-Host "  ${White}Vault:${Reset} $vaultPath"
 Write-Host ""
-Write-Host "  ${White}Next steps:${Reset}"
-Write-Host "  1. Open Obsidian, select vault: $vaultPath"
-Write-Host "  2. In Obsidian: gear icon (bottom-left) -> General -> Enable CLI"
-Write-Host "  3. Open a new PowerShell window (Win -> type 'powershell' -> Enter):"
-Write-Host "     cd `"$vaultPath`""
-Write-Host "     claude"
-Write-Host "  4. Type: /vault-setup"
-Write-Host "     (Claude will interview you and personalize your vault)"
-Write-Host ""
-Write-Host "  ${Dim}This script is safe to re-run -- it detects existing vaults, creates"
-Write-Host "  timestamped backups of CLAUDE.md, and only adds what is missing.${Reset}"
+Write-Host "  One manual step, once: in Obsidian, gear icon (bottom-left)"
+Write-Host "  -> General -> Enable Command Line Interface."
 Write-Host ""
 
-# Open Obsidian
-Start-Process "obsidian://" -ErrorAction SilentlyContinue
+if ($pyBin) {
+    & $pyBin $ovModule --open $vaultPath
+} else {
+    Write-Host "If Obsidian did not open automatically:"
+    Write-Host "  Obsidian -> Open folder as vault -> $vaultPath"
+}
+
+Write-Host ""
+Write-Host "  ${White}Now Claude will make this vault yours.${Reset}"
+Write-Host ""
+Write-Host "  It will ask who you are and what you want this for, then write the"
+Write-Host "  CLAUDE.md that every future session reads. Takes about five minutes."
+Write-Host ""
+Write-Host "  ${Dim}Launching on Opus - this interview is the one place model quality"
+Write-Host "  really shows, because everything downstream reads what it writes.${Reset}"
+Write-Host ""
+
+if ($env:NOESIS_NO_HANDOFF) {
+    Write-Host "  ${Dim}[NOESIS_NO_HANDOFF set - skipping handoff]${Reset}"
+    exit 0
+}
+
+$claude = (Get-Command claude -ErrorAction SilentlyContinue)
+if ($claude) {
+    Set-Location $vaultPath
+    & claude --model opus "/vault-setup"
+} else {
+    Write-Host "  ${Orange}!${Reset}  'claude' isn't on this terminal's PATH yet (normal right after install)."
+    Write-Host ""
+    Write-Host "  ${White}Open a NEW PowerShell window and paste this:${Reset}"
+    Write-Host ""
+    Write-Host "     ${Cyan}cd `"$vaultPath`"; claude --model opus `"/vault-setup`"${Reset}"
+    Write-Host ""
+    Write-Host "  ${Dim}That is the last step - the interview personalizes your vault.${Reset}"
+    Write-Host ""
+}
