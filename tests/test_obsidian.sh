@@ -18,9 +18,16 @@ else
   assert_contains "$out" "obsidian.json" "--registry-path names obsidian.json"
   assert_contains "$out" "obsidian" "--registry-path is under an obsidian dir"
 
-  # --registry overrides resolution
+  # --registry overrides resolution.
+  # Do NOT assert exact string equality against "$TMP/custom.json": under Git
+  # Bash, MSYS rewrites a POSIX path argument to a native Windows one before it
+  # reaches a non-MSYS python, so the echoed path legitimately differs in FORM
+  # from what bash passed. Assert the override's EFFECT instead -- custom.json
+  # replaces the default obsidian.json entirely -- which is the actual behavior
+  # under test and is identical on every platform.
   out="$("$PY" "$OV" --registry-path --registry "$TMP/custom.json" 2>&1)"
-  assert_eq "$out" "$TMP/custom.json" "--registry overrides the resolved path"
+  assert_contains "$out" "custom.json" "--registry override reaches the resolver"
+  assert_not_contains "$out" "obsidian.json" "--registry override replaces the default entirely"
 
   # --list on a populated registry prints one path per line
   out="$("$PY" "$OV" --list --registry "$FIX/registry-two-vaults.json" 2>&1)"

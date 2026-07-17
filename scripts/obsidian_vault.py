@@ -29,15 +29,6 @@ FALLBACK = ("If Obsidian did not open automatically:\n"
 
 def registry_path(override=None):
     if override:
-        # On Windows, Git Bash may have converted /tmp/ paths to C:\...\Temp\.
-        # Detect this conversion and reverse it to preserve the original intent.
-        if platform.system() == "Windows" and "AppData" in override and "Local" in override and "Temp" in override:
-            # Check if this looks like a MSYS converted /tmp path
-            import re
-            match = re.search(r"[/\\]Temp[/\\](.+)$", override)
-            if match:
-                suffix = match.group(1).replace("\\", "/")
-                return "/tmp/" + suffix
         return override
     system = platform.system()
     home = os.path.expanduser("~")
