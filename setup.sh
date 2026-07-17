@@ -164,7 +164,7 @@ else
   echo -e "  ${ORANGE}⚠${RESET}  Python 3 not found. Install: brew install python3"
 fi
 
-# ─── STEP 5: Vault setup ─────────────────────────────────────────────────────
+# ─── STEP 6: Vault setup ─────────────────────────────────────────────────────
 echo ""
 echo -e "${WHITE}Step 5/7 — Setting up your vault${RESET}"
 echo ""
@@ -291,17 +291,6 @@ if [ "$HAS_OBSIDIAN_FOLDER" = true ] || [ "$IS_NON_EMPTY" = true ]; then
     cp "$VAULT_PATH/CLAUDE.md" "$VAULT_PATH/$BACKUP_NAME"
     echo -e "  ${GREEN}✓${RESET} Backed up existing CLAUDE.md → $BACKUP_NAME"
   fi
-fi
-
-# Obsidian holds the registry in memory and rewrites it on quit, which would
-# silently undo our registration. Ask first -- a named action, not a dead end.
-PY_BIN="$(noesis_python)"
-if [ -n "$PY_BIN" ] && "$PY_BIN" "$SCRIPT_DIR/scripts/obsidian_vault.py" --check-running >/dev/null 2>&1; then
-  echo ""
-  echo -e "  ${ORANGE}!${RESET}  Obsidian is running. It rewrites its vault list when it quits,"
-  echo -e "     which would undo the registration I'm about to do."
-  echo -e "     ${WHITE}Quit Obsidian, then press Enter.${RESET}"
-  read -rp "  " _
 fi
 
 mkdir -p "$VAULT_PATH"/{inbox,daily,projects,research,archive,scripts,.claude/skills/vault-setup,.claude/skills/daily,.claude/skills/tldr,.claude/skills/file-intel,.claude/skills/weekly,.claude/skills/vault-health,.claude/skills/jobs,.claude/skills/jobs-setup}
@@ -591,6 +580,21 @@ echo ""
 echo -e "  ${DIM}This script is safe to re-run — it detects existing vaults, creates"
 echo -e "  timestamped backups of CLAUDE.md, and only adds what is missing.${RESET}"
 echo ""
+
+# A running Obsidian holds the vault registry in memory and rewrites it on quit,
+# which would silently undo the registration we are about to do -- and a launch
+# would no-op against the already-running app, so the vault would never open.
+# This check MUST sit adjacent to the write below: an earlier draft put it ~300
+# lines up, with the API-key prompt, a multi-minute file import, and a network
+# clone in between, which is long enough for the user to honestly reopen Obsidian.
+PY_BIN="$(noesis_python)"
+if [ -n "$PY_BIN" ] && "$PY_BIN" "$SCRIPT_DIR/scripts/obsidian_vault.py" --check-running >/dev/null 2>&1; then
+  echo -e "  ${ORANGE}!${RESET}  Obsidian is running. It rewrites its vault list when it quits,"
+  echo -e "     which would undo the registration I'm about to do."
+  echo -e "     ${WHITE}Quit Obsidian, then press Enter.${RESET}"
+  read -rp "  " _
+  echo ""
+fi
 
 # Open Obsidian
 open_vault_in_obsidian "$VAULT_PATH"
