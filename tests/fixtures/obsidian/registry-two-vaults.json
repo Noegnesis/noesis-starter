@@ -1,0 +1,17 @@
+{
+  "vaults": {
+    "fbf127efedf17729": {
+      "path": "/tmp/noesis-fixture-alpha",
+      "ts": 1750000000000,
+      "color": "#7c3aed"
+    },
+    "9d398849fb24af54": {
+      "path": "/tmp/noesis-fixture-beta",
+      "ts": 1751000000000,
+      "open": true
+    }
+  },
+  "cli": {
+    "enabled": true
+  }
+}
