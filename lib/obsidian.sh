@@ -7,7 +7,20 @@
 _obsidian_lib_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NOESIS_OBSIDIAN_PY="${NOESIS_OBSIDIAN_PY:-$_obsidian_lib_dir/../scripts/obsidian_vault.py}"
 
-noesis_python() { command -v python3 2>/dev/null || command -v python 2>/dev/null || true; }
+# Resolve a python that actually RUNS. Presence is not proof: Windows ships
+# App Execution Alias stubs for python3/python that resolve on PATH, open the
+# Microsoft Store, and exit 9009 -- and a broken interpreter resolves fine too.
+# Callers treat empty output as "no python" and fall back to the manual path.
+noesis_python() {
+  for _c in python3 python; do
+    _p="$(command -v "$_c" 2>/dev/null || true)"
+    if [ -n "$_p" ] && "$_p" -c "pass" >/dev/null 2>&1; then
+      echo "$_p"
+      return 0
+    fi
+  done
+  return 0
+}
 
 # obsidian_list_vaults [registry_override] -> one vault path per line
 obsidian_list_vaults() {

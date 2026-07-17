@@ -161,6 +161,18 @@ else
   out="$(PATH=/nonexistent open_vault_in_obsidian "/tmp/my vault" 2>&1)"; rc=$?
   assert_eq "$rc" "0" "open_vault_in_obsidian returns 0 without python"
   assert_contains "$out" "Open folder as vault -> /tmp/my vault" "fallback prints even without python"
+
+  # --- a python that RESOLVES but does not RUN must be rejected ---
+  # Windows' Store stubs resolve on PATH and exit 9009; a broken interpreter
+  # resolves fine too. Presence is not proof.
+  mkdir -p "$TMP/fakebin"
+  printf '#!/bin/sh\nexit 9009\n' > "$TMP/fakebin/python3"
+  printf '#!/bin/sh\nexit 9009\n' > "$TMP/fakebin/python"
+  chmod +x "$TMP/fakebin/python3" "$TMP/fakebin/python"
+  out="$(PATH="$TMP/fakebin" noesis_python 2>&1)"
+  assert_eq "$out" "" "noesis_python rejects an interpreter that resolves but exits nonzero"
+  out="$(PATH="$TMP/fakebin" open_vault_in_obsidian "/tmp/my vault" 2>&1)"
+  assert_contains "$out" "Open folder as vault -> /tmp/my vault" "a broken interpreter still yields the manual fallback"
 fi
 
 # This runs with OR without python. With python it delegates, and the module

@@ -41,4 +41,6 @@ assert_contains "$ps" "not personalized yet" "setup.ps1 says what is actually tr
 assert_eq "$(grep -c 'check-running' "$ROOT/setup.sh")" "1" "setup.sh guards against a running Obsidian"
 assert_eq "$(grep -c 'check-running' "$ROOT/setup.ps1")" "1" "setup.ps1 guards against a running Obsidian"
 
+assert_contains "$ps" "GetEnvironmentVariable('Path','Machine')" "setup.ps1 re-resolves PATH before looking for claude"
+
 finish

@@ -8,10 +8,18 @@ function Invoke-Doctor {
     # step already falls back to `py -m pip`, so a py-only machine is fully
     # supported -- reporting it missing would send a user to install Python they
     # already have. The registry check below reuses this same resolution.
+    #
+    # Presence is not proof it runs: Windows' App Execution Alias stubs for
+    # python3/python resolve on PATH, open the Microsoft Store, and exit 9009.
+    # Probe each candidate before trusting it -- otherwise this would print a
+    # false "OK python (python3.exe)" on a Python-less Windows box.
     $ovPy = $null
     foreach ($c in @('python3', 'python', 'py')) {
-        $ovPy = Get-Command $c -ErrorAction SilentlyContinue
-        if ($ovPy) { break }
+        $cand = Get-Command $c -ErrorAction SilentlyContinue
+        if ($cand) {
+            & $cand.Source -c "pass" 2>$null | Out-Null
+            if ($LASTEXITCODE -eq 0) { $ovPy = $cand; break }
+        }
     }
     if ($ovPy) { Write-Host "  OK   python ($($ovPy.Name))" }
     else { Write-Host "  FAIL python not found"; $missing++ }

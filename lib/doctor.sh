@@ -22,7 +22,7 @@ run_doctor() {
   py="$(command -v python3 2>/dev/null || command -v python 2>/dev/null || true)"
   ov="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts/obsidian_vault.py"
   if [ -n "$py" ] && [ -f "$ov" ]; then
-    reg="$("$py" "$ov" --registry-path 2>/dev/null)"
+    reg="$("$py" "$ov" --registry-path 2>/dev/null || true)"
     if [ -n "$reg" ] && [ -f "$reg" ]; then
       echo "  OK   Obsidian vault registry ($reg)"
     else

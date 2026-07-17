@@ -228,8 +228,14 @@ Write-Host ""
 # to the manual fallback while claiming Windows parity.
 function Get-NoesisPython {
     foreach ($c in @('python3', 'python', 'py')) {
-        $p = (Get-Command $c -ErrorAction SilentlyContinue)
-        if ($p) { return $p.Source }
+        $p = Get-Command $c -ErrorAction SilentlyContinue
+        if ($p) {
+            # Presence is not proof it runs: Windows' App Execution Alias stubs
+            # for python3/python resolve on PATH, open the Microsoft Store, and
+            # exit 9009. Probe before trusting.
+            & $p.Source -c "pass" 2>$null | Out-Null
+            if ($LASTEXITCODE -eq 0) { return $p.Source }
+        }
     }
     return $null
 }
@@ -716,6 +722,11 @@ if ($env:NOESIS_NO_HANDOFF) {
     Write-Host "  ${Dim}[NOESIS_NO_HANDOFF set - skipping handoff]${Reset}"
     exit 0
 }
+
+# winget wrote claude's PATH entry during THIS process, so our in-memory copy is
+# stale and Get-Command can't see it. Re-read the real Machine+User PATH rather
+# than guessing install directories.
+$env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User')
 
 $claude = (Get-Command claude -ErrorAction SilentlyContinue)
 if ($claude) {
