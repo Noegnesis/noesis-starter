@@ -80,6 +80,19 @@ else
   bcount="$(ls "$TMP"/existing.json.backup-* 2>/dev/null | grep -c .)"
   assert_eq "$bcount" "1" "register backs the registry up before writing"
 
+  # --- a second backup within the same second must not clobber the first ---
+  # The pristine pre-Noesis vault list is the copy worth keeping; a
+  # second-granularity filename alone would let the second write's backup
+  # (already modified) silently replace it.
+  cp "$FIX/registry-two-vaults.json" "$TMP/multi.json"
+  mkdir -p "$TMP/d1" "$TMP/d2"
+  "$PY" "$OV" --register "$TMP/d1" --registry "$TMP/multi.json" >/dev/null 2>&1
+  "$PY" "$OV" --register "$TMP/d2" --registry "$TMP/multi.json" >/dev/null 2>&1
+  bcount="$(ls "$TMP"/multi.json.backup-* 2>/dev/null | grep -c .)"
+  assert_eq "$bcount" "2" "a same-second second backup does not clobber the first"
+  oldest="$(ls "$TMP"/multi.json.backup-* | head -1)"
+  assert_not_contains "$(cat "$oldest")" "d1" "the oldest backup still holds the pristine registry"
+
   # --- exactly one vault carries open:true, and it is ours ---
   opencount="$(grep -c '"open": true' "$TMP/existing.json")"
   assert_eq "$opencount" "1" "exactly one vault is marked open"

@@ -92,10 +92,21 @@ def cmd_list(args):
 
 
 def backup(path):
-    """Copy the registry aside before we touch it. Returns the backup path."""
+    """Copy the registry aside before we touch it. Returns the backup path.
+
+    Never overwrites an earlier backup. A second-granularity stamp alone would:
+    two registrations inside one second would reuse the filename, and the second
+    copy -- already modified by the first write -- would silently replace the
+    user's pristine vault list. That copy is the whole point of backing up.
+    """
     if not os.path.exists(path):
         return None
-    dest = "%s.backup-%s" % (path, time.strftime("%Y%m%d-%H%M%S"))
+    stamp = time.strftime("%Y%m%d-%H%M%S")
+    dest = "%s.backup-%s" % (path, stamp)
+    n = 2
+    while os.path.exists(dest):
+        dest = "%s.backup-%s-%d" % (path, stamp, n)
+        n += 1
     shutil.copy2(path, dest)
     return dest
 
