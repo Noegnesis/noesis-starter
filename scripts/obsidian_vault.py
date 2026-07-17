@@ -91,6 +91,68 @@ def cmd_list(args):
     return 0
 
 
+def backup(path):
+    """Copy the registry aside before we touch it. Returns the backup path."""
+    if not os.path.exists(path):
+        return None
+    dest = "%s.backup-%s" % (path, time.strftime("%Y%m%d-%H%M%S"))
+    shutil.copy2(path, dest)
+    return dest
+
+
+def save_registry(path, data):
+    """Atomic write: temp file beside the target, then replace."""
+    parent = os.path.dirname(path)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+    tmp = "%s.tmp-%d" % (path, os.getpid())
+    with open(tmp, "w", encoding="utf-8") as fh:
+        json.dump(data, fh, indent=2)
+        fh.write("\n")
+    os.replace(tmp, path)
+
+
+def register(vault, registry):
+    """Register vault in registry. Returns its id. Raises ValueError."""
+    vault_abs = normalize(vault)
+    if not os.path.isdir(vault_abs):
+        raise ValueError("not a directory: %s" % vault_abs)
+    try:
+        data, existed = load_registry(registry)
+    except ValueError:
+        backup(registry)
+        raise
+    if existed:
+        backup(registry)
+    vid = find_vault_id(data, vault_abs)
+    if vid is None:
+        vid = secrets.token_hex(8)
+    entry = dict(data["vaults"].get(vid, {}))   # keep unknown per-vault fields
+    entry["path"] = vault_abs
+    entry["ts"] = int(time.time() * 1000)
+    for other in data["vaults"].values():       # only one vault opens on launch
+        if isinstance(other, dict):
+            other.pop("open", None)
+    entry["open"] = True
+    data["vaults"][vid] = entry
+    save_registry(registry, data)
+    return vid
+
+
+def cmd_register(args):
+    path = registry_path(args.registry)
+    try:
+        vid = register(args.register, path)
+    except ValueError as exc:
+        sys.stderr.write("error: %s\n" % exc)
+        return 1
+    except OSError as exc:
+        sys.stderr.write("error: could not write %s: %s\n" % (path, exc))
+        return 1
+    sys.stdout.write("%s\n" % vid)
+    return 0
+
+
 def build_parser():
     p = argparse.ArgumentParser(
         description="Register and open Obsidian vaults via obsidian.json.")
@@ -120,6 +182,8 @@ def main(argv=None):
         return 0
     if args.list:
         return cmd_list(args)
+    if args.register:
+        return cmd_register(args)
     return 1
 
 

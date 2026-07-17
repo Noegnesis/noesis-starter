@@ -45,6 +45,58 @@ else
   out="$("$PY" "$OV" --list --registry "$FIX/registry-malformed.json" 2>&1)"; rc=$?
   assert_eq "$rc" "1" "--list on a malformed registry exits 1"
   assert_contains "$out" "not valid JSON" "--list on a malformed registry explains why"
+
+  # --- register: fresh registry on a machine where Obsidian never launched ---
+  mkdir -p "$TMP/fresh-vault"
+  reg="$TMP/fresh/obsidian.json"
+  id="$("$PY" "$OV" --register "$TMP/fresh-vault" --registry "$reg" 2>&1)"; rc=$?
+  assert_eq "$rc" "0" "register creates a registry that did not exist"
+  assert_file_exists "$reg" "register creates obsidian.json and its parent dir"
+  case "$id" in
+    [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) pass "register prints a 16-char lowercase hex id";;
+    *) fail "register prints a 16-char lowercase hex id (got '$id')";;
+  esac
+  out="$("$PY" "$OV" --list --registry "$reg" 2>&1)"
+  assert_contains "$out" "fresh-vault" "the registered vault is now listed"
+
+  # --- register is idempotent: same path re-registers under the SAME id ---
+  id2="$("$PY" "$OV" --register "$TMP/fresh-vault" --registry "$reg" 2>&1)"
+  assert_eq "$id2" "$id" "re-registering the same path reuses its id"
+  lines="$("$PY" "$OV" --list --registry "$reg" 2>&1 | grep -c .)"
+  assert_eq "$lines" "1" "re-registering does not duplicate the entry"
+
+  # --- register preserves unknown top-level keys and unknown per-vault fields ---
+  cp "$FIX/registry-two-vaults.json" "$TMP/existing.json"
+  mkdir -p "$TMP/gamma"
+  "$PY" "$OV" --register "$TMP/gamma" --registry "$TMP/existing.json" >/dev/null 2>&1
+  body="$(cat "$TMP/existing.json")"
+  assert_contains "$body" '"cli"' "unknown top-level key 'cli' survives a write"
+  assert_contains "$body" '"color"' "unknown per-vault field 'color' survives a write"
+  assert_contains "$body" "noesis-fixture-alpha" "pre-existing vaults survive a write"
+  lines="$("$PY" "$OV" --list --registry "$TMP/existing.json" 2>&1 | grep -c .)"
+  assert_eq "$lines" "3" "register adds to, rather than replaces, the vault list"
+
+  # --- register backs up before writing ---
+  bcount="$(ls "$TMP"/existing.json.backup-* 2>/dev/null | grep -c .)"
+  assert_eq "$bcount" "1" "register backs the registry up before writing"
+
+  # --- exactly one vault carries open:true, and it is ours ---
+  opencount="$(grep -c '"open": true' "$TMP/existing.json")"
+  assert_eq "$opencount" "1" "exactly one vault is marked open"
+
+  # --- register REFUSES a malformed registry rather than clobbering it ---
+  cp "$FIX/registry-malformed.json" "$TMP/bad.json"
+  before="$(cat "$TMP/bad.json")"
+  out="$("$PY" "$OV" --register "$TMP/gamma" --registry "$TMP/bad.json" 2>&1)"; rc=$?
+  assert_eq "$rc" "1" "register on a malformed registry exits 1"
+  assert_contains "$out" "not valid JSON" "register on a malformed registry explains why"
+  assert_eq "$(cat "$TMP/bad.json")" "$before" "register leaves a malformed registry byte-identical"
+  bcount="$(ls "$TMP"/bad.json.backup-* 2>/dev/null | grep -c .)"
+  assert_eq "$bcount" "1" "register backs up even a malformed registry before refusing"
+
+  # --- register rejects a path that is not a directory ---
+  out="$("$PY" "$OV" --register "$TMP/does-not-exist" --registry "$reg" 2>&1)"; rc=$?
+  assert_eq "$rc" "1" "register rejects a non-directory path"
 fi
 
 out="$(open_vault_in_obsidian "/tmp/my vault" 2>&1)"
